@@ -1,5 +1,9 @@
 # fan-unification-platform
 
+[![ci](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/ci.yml)
+[![site](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/site.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/site.yml)
+[![nightly](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/nightly.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/nightly.yml)
+
 **A fan identity-resolution and data-warehouse platform, with the accuracy
 measured instead of asserted.** Four messy source systems for a fictional
 national soccer federation — a Salesforce-style CRM, ticketing, merch, and

@@ -26,6 +26,15 @@ def test_same_seed_same_bytes(tmp_path: Path) -> None:
     assert tree_digest(a) == tree_digest(b)
 
 
+def test_regeneration_clears_stale_outputs(tmp_path: Path) -> None:
+    out = tmp_path / "data"
+    stale = out / "dropzone" / "ticketing" / "orders_1999-01.jsonl"
+    stale.parent.mkdir(parents=True)
+    stale.write_text('{"stale": true}\n', encoding="utf-8")
+    generate(GenConfig(seed=11, fans=60, out_dir=str(out)))
+    assert not stale.exists()
+
+
 def test_different_seed_different_bytes(tmp_path: Path) -> None:
     a, b = tmp_path / "a", tmp_path / "b"
     generate(GenConfig(seed=11, fans=100, out_dir=str(a)))

@@ -6,6 +6,7 @@ import csv
 import hashlib
 import json
 import random
+import shutil
 from collections import Counter
 from dataclasses import asdict
 from pathlib import Path
@@ -80,6 +81,11 @@ def _write_csv(path: Path, rows: list[dict[str, Any]], columns: list[str]) -> No
 def generate(config: GenConfig) -> dict[str, Any]:
     """Run the full generation; returns the manifest that was written."""
     out = Path(config.out_dir)
+    # The generator owns its output dirs: clear them first, or a smaller
+    # regeneration leaves stale files from a larger earlier run in months the
+    # new run doesn't write (a real bug the integration suite caught).
+    for sub in ("dropzone", "sfmock", "truth"):
+        shutil.rmtree(out / sub, ignore_errors=True)
     fans = build_population(config)
     # A separate, deterministically derived stream for emission keeps
     # population and record-level randomness independent but reproducible.

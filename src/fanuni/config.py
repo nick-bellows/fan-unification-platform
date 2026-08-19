@@ -23,6 +23,11 @@ class Settings(BaseSettings):
 
     sf_base_url: str = "http://localhost:8001"
     sf_token: SecretStr = SecretStr("dev-local-token")
+    sf_client_id: str = "fanuni-dev-client"
+    sf_client_secret: SecretStr = SecretStr("dev-client-secret")
+
+    dropzone_dir: str = "data/dropzone"
+    warehouse_dir: str = "warehouse"
 
 
 def load_settings() -> Settings:

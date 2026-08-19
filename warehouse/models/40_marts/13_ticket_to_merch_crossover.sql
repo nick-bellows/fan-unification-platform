@@ -1,6 +1,11 @@
 -- The cross-sell question unification exists to answer: of fans whose first
 -- ticket purchase fell in a month, how many bought merch within 90 days?
 -- Impossible to compute without cross-system identity.
+--
+-- Written as a hash join, not a correlated EXISTS: the subquery form
+-- seq-scanned fact_merch_sales once per ticket fan (~14M row visits, 506 ms);
+-- this form runs in ~4 ms and is also the shape Redshift wants (co-located
+-- DISTKEY fan_key join). ADR 0006.
 DROP TABLE IF EXISTS marts.ticket_to_merch_crossover;
 CREATE TABLE marts.ticket_to_merch_crossover AS
 WITH first_ticket AS (
@@ -11,13 +16,13 @@ conversion AS (
   SELECT
     f.fan_key,
     date_trunc('month', f.first_ticket_at)::date AS cohort_month,
-    EXISTS (
-      SELECT 1 FROM core.fact_merch_sales ms
-      WHERE ms.fan_key = f.fan_key
-        AND ms.created_at >= f.first_ticket_at
-        AND ms.created_at < f.first_ticket_at + interval '90 days'
-    ) AS converted
+    count(ms.fan_key) > 0 AS converted
   FROM first_ticket f
+  LEFT JOIN core.fact_merch_sales ms
+    ON ms.fan_key = f.fan_key
+   AND ms.created_at >= f.first_ticket_at
+   AND ms.created_at < f.first_ticket_at + interval '90 days'
+  GROUP BY f.fan_key, date_trunc('month', f.first_ticket_at)::date
 )
 SELECT
   cohort_month,

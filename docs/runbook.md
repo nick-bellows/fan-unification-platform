@@ -33,6 +33,14 @@ Reloads are always safe: file loads are delete+insert keyed on the source
 file, and re-extracting the CRM re-lands versions that staging dedupes by
 `SystemModstamp`.
 
+**Replacing the dataset wholesale** (different seed or size): drop all
+schemas first — `raw` is an append-only extraction log with run-stamped
+object keys, so records from two different generations would coexist and
+staging would dedupe across them on colliding synthetic IDs.
+`psql -c "DROP SCHEMA raw, staging, identity, core, marts, ops CASCADE"`,
+then `fanuni init-db` and rerun. (Real warehouses hit the same thing as a
+source-system migration; the answer there is also a controlled reload.)
+
 **Rebuilding the two incremental tables** (needed if unification reshapes
 clusters and you want history to reflect it):
 `DROP TABLE core.fact_email_engagement;` and/or `DROP TABLE core.dim_fan;`

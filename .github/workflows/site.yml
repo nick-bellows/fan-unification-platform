@@ -24,8 +24,10 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e .
-      - run: docker compose up -d --build --wait
+      # Generate before compose up so the bind-mount sources exist with
+      # runner ownership (compose would create them root-owned).
       - run: fanuni generate --seed 42 --fans 5000
+      - run: docker compose up -d --build --wait
       - run: fanuni init-db
       - run: fanuni pipeline
       - run: fanuni evaluate

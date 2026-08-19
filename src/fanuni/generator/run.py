@@ -83,9 +83,19 @@ def generate(config: GenConfig) -> dict[str, Any]:
     out = Path(config.out_dir)
     # The generator owns its output dirs: clear them first, or a smaller
     # regeneration leaves stale files from a larger earlier run in months the
-    # new run doesn't write (a real bug the integration suite caught).
+    # new run doesn't write (a real bug the integration suite caught). Clear
+    # CONTENTS rather than the dirs themselves — data/sfmock is bind-mounted
+    # into the mock-Salesforce container, and on Linux removing a mounted
+    # dir's source detaches the mount, leaving the mock serving nothing.
     for sub in ("dropzone", "sfmock", "truth"):
-        shutil.rmtree(out / sub, ignore_errors=True)
+        target = out / sub
+        if not target.is_dir():
+            continue
+        for child in target.iterdir():
+            if child.is_dir():
+                shutil.rmtree(child, ignore_errors=True)
+            else:
+                child.unlink(missing_ok=True)
     fans = build_population(config)
     # A separate, deterministically derived stream for emission keeps
     # population and record-level randomness independent but reproducible.

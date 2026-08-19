@@ -72,6 +72,9 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e .[dev]
+      # Pre-create the bind-mount sources as the runner user; letting compose
+      # create them makes them root-owned and unwritable to the generator.
+      - run: mkdir -p data/sfmock data/dropzone
       - run: docker compose up -d --build --wait
       - run: pytest -m integration -v
         env:

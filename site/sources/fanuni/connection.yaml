@@ -1,0 +1,12 @@
+# Local-only connection matching compose.yml — these are not real credentials
+# (same values as .env.example). Override any field with
+# EVIDENCE_SOURCE__fanuni__<option> environment variables.
+name: fanuni
+type: postgres
+options:
+  host: localhost
+  port: 5433
+  database: fanuni
+  user: fanuni
+  password: fanuni_local
+  ssl: false

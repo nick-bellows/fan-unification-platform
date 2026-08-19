@@ -26,6 +26,7 @@ data/
 site/node_modules/
 site/.evidence/
 site/build/
+site/.svelte-kit/
 
 # Terraform
 infra/terraform/.terraform/

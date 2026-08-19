@@ -52,6 +52,36 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker build -f docker/salesforce-mock.Dockerfile -t fanuni-sfmock:ci .
 
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra/terraform fmt -check
+      - run: terraform -chdir=infra/terraform init -backend=false
+      - run: terraform -chdir=infra/terraform validate
+
+  integration:
+    runs-on: ubuntu-latest
+    env:
+      PREFECT_API_URL: http://localhost:4200/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .[dev]
+      - run: docker compose up -d --build --wait
+      - run: pytest -m integration -v
+        env:
+          FANUNI_REQUIRE_STACK: "1"
+      - name: stack logs on failure
+        if: failure()
+        run: docker compose logs --tail 100
+      - run: docker compose down -v
+        if: always()
+
   gitleaks:
     runs-on: ubuntu-latest
     steps:

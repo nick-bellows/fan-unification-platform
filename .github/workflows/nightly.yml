@@ -1,0 +1,44 @@
+# The "operating a production pipeline" evidence: a scheduled end-to-end run
+# on the full-size dataset — ingest, transform, unify, quality gates, linkage
+# eval — with the run report and eval results kept as artifacts. A failure
+# fails the workflow, which notifies via GitHub's standard channels.
+name: nightly-pipeline
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    env:
+      PREFECT_API_URL: http://localhost:4200/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - run: docker compose up -d --build --wait
+      - run: fanuni generate --seed 42 --fans 5000
+      - run: fanuni init-db
+      - name: full pipeline (ingest -> transform -> quality gates)
+        run: fanuni pipeline | tee nightly_run.json
+      - name: linkage evaluation against ground truth
+        run: fanuni evaluate | tee nightly_eval.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-run-${{ github.run_number }}
+          path: |
+            nightly_run.json
+            nightly_eval.txt
+            eval/results/
+      - name: stack logs on failure
+        if: failure()
+        run: docker compose logs --tail 200

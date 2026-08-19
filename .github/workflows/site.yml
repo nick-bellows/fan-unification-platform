@@ -1,0 +1,61 @@
+# Builds the Evidence dashboards from a REAL pipeline run — the compose stack
+# comes up, the full-size dataset flows through ingest/transform/unify/gates,
+# and only then does Evidence extract from the marts. The published site is
+# provably the pipeline's output, not hand-fed numbers.
+name: site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PREFECT_API_URL: http://localhost:4200/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - run: docker compose up -d --build --wait
+      - run: fanuni generate --seed 42 --fans 5000
+      - run: fanuni init-db
+      - run: fanuni pipeline
+      - run: fanuni evaluate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run sources
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/build
+      - run: docker compose down -v
+        if: always()
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

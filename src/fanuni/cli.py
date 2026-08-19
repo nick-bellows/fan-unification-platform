@@ -53,6 +53,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     ev.add_argument("--truth", default="data/truth/record_map.csv")
     ev.add_argument("--out", default="eval/results")
     ev.add_argument("--review-dir", default="data/review")
+    ev.add_argument(
+        "--sweep",
+        action="store_true",
+        help="run the auto-merge threshold sweep instead of the standard eval",
+    )
 
     pipe = sub.add_parser("pipeline", help="full nightly run: ingest -> transform -> dq")
     pipe.add_argument("--full-refresh", action="store_true")
@@ -147,9 +152,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         from pathlib import Path
 
         from fanuni.pipeline.db import connect
-        from fanuni.unification.evaluate import run_eval
+        from fanuni.unification.evaluate import run_eval, run_threshold_sweep
 
         settings = load_settings()
+        if args.sweep:
+            with connect(settings) as conn:
+                rows = run_threshold_sweep(conn, Path(args.truth), Path(args.out))
+            for row in rows:
+                threshold = row["threshold"] if row["threshold"] is not None else "baseline"
+                print(
+                    f"{row['variant']} @ {threshold}: precision={row['precision']:.4f}"
+                    f" recall={row['recall']:.4f} f1={row['f1']:.4f}"
+                )
+            print(f"sweep written to {args.out}/threshold_sweep.md")
+            return 0
         with connect(settings) as conn:
             report = run_eval(conn, Path(args.truth), Path(args.out), Path(args.review_dir))
         for variant, data in report["variants"].items():

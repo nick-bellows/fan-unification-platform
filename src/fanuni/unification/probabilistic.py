@@ -19,7 +19,11 @@ import pandas as pd
 from fanuni.unification.nicknames import canonical_first_name
 from fanuni.unification.records import IdentityRecord, fold
 
-UNIFIER_VERSION = "2"  # 1 = deterministic only (M3); 2 = + Splink pass
+# 1 = deterministic only (M3); 2 = + Splink pass at auto-merge 0.90;
+# 3 = operating point moved to 0.9999 after the full-scale threshold sweep
+# (eval/results/threshold_sweep.md) showed FS posteriors saturate and v2's
+# threshold lost to the deterministic baseline on F1 at 5k fans.
+UNIFIER_VERSION = "3"
 
 
 @dataclass(frozen=True)
@@ -37,8 +41,13 @@ class ProbabilisticResult:
 
 @dataclass(frozen=True)
 class UnifyConfig:
-    auto_merge_threshold: float = 0.90
-    review_threshold: float = 0.50
+    # Operating point chosen from the measured precision/recall curve at full
+    # scale (eval/results/threshold_sweep.md): with many agreeing fields the
+    # Fellegi-Sunter posterior saturates near 1.0, so the useful separation
+    # between real matches and household/name-coincidence pairs happens above
+    # 0.999. The band below the auto-merge threshold goes to clerical review.
+    auto_merge_threshold: float = 0.9999
+    review_threshold: float = 0.999
     em_max_pairs: float = 4e6
     seed: int = 42
 

@@ -1,0 +1,174 @@
+{
+  "unifier_version": "3",
+  "evaluated_at": "2026-08-19T14:55:29.880521+00:00",
+  "config": {
+    "auto_merge_threshold": 0.9999,
+    "review_threshold": 0.999,
+    "em_max_pairs": 4000000.0,
+    "seed": 42
+  },
+  "records_evaluated": 17487,
+  "review_band": 3376,
+  "variants": {
+    "deterministic": {
+      "metrics": {
+        "precision": 0.8478,
+        "recall": 0.9336,
+        "f1": 0.8887,
+        "tp": 28717,
+        "fp": 5154,
+        "fn": 2042,
+        "predicted_clusters": 5307,
+        "true_entities": 5000
+      },
+      "by_tag": [
+        {
+          "tag": "case",
+          "true_pairs": 4946,
+          "pair_recall": 0.9414,
+          "fp_pairs": 798
+        },
+        {
+          "tag": "diacritics",
+          "true_pairs": 1431,
+          "pair_recall": 0.9196,
+          "fp_pairs": 937
+        },
+        {
+          "tag": "late_arrival",
+          "true_pairs": 611,
+          "pair_recall": 0.9836,
+          "fp_pairs": 108
+        },
+        {
+          "tag": "missing_dob",
+          "true_pairs": 1199,
+          "pair_recall": 0.9475,
+          "fp_pairs": 233
+        },
+        {
+          "tag": "name_format",
+          "true_pairs": 6466,
+          "pair_recall": 0.9692,
+          "fp_pairs": 1434
+        },
+        {
+          "tag": "nickname",
+          "true_pairs": 7739,
+          "pair_recall": 0.9315,
+          "fp_pairs": 1153
+        },
+        {
+          "tag": "resubscribed_new_email",
+          "true_pairs": 377,
+          "pair_recall": 0.6048,
+          "fp_pairs": 20
+        },
+        {
+          "tag": "shared_email",
+          "true_pairs": 2796,
+          "pair_recall": 0.7346,
+          "fp_pairs": 2247
+        },
+        {
+          "tag": "stale_email",
+          "true_pairs": 2207,
+          "pair_recall": 0.7367,
+          "fp_pairs": 397
+        },
+        {
+          "tag": "typo",
+          "true_pairs": 3644,
+          "pair_recall": 0.73,
+          "fp_pairs": 470
+        },
+        {
+          "tag": "within_source_dup",
+          "true_pairs": 301,
+          "pair_recall": 0.9635,
+          "fp_pairs": 35
+        }
+      ]
+    },
+    "full": {
+      "metrics": {
+        "precision": 0.8485,
+        "recall": 0.9644,
+        "f1": 0.9028,
+        "tp": 29664,
+        "fp": 5295,
+        "fn": 1095,
+        "predicted_clusters": 5031,
+        "true_entities": 5000
+      },
+      "by_tag": [
+        {
+          "tag": "case",
+          "true_pairs": 4946,
+          "pair_recall": 0.9687,
+          "fp_pairs": 827
+        },
+        {
+          "tag": "diacritics",
+          "true_pairs": 1431,
+          "pair_recall": 0.9623,
+          "fp_pairs": 962
+        },
+        {
+          "tag": "late_arrival",
+          "true_pairs": 611,
+          "pair_recall": 0.9935,
+          "fp_pairs": 110
+        },
+        {
+          "tag": "missing_dob",
+          "true_pairs": 1199,
+          "pair_recall": 0.9733,
+          "fp_pairs": 233
+        },
+        {
+          "tag": "name_format",
+          "true_pairs": 6466,
+          "pair_recall": 0.9858,
+          "fp_pairs": 1451
+        },
+        {
+          "tag": "nickname",
+          "true_pairs": 7739,
+          "pair_recall": 0.961,
+          "fp_pairs": 1180
+        },
+        {
+          "tag": "resubscribed_new_email",
+          "true_pairs": 377,
+          "pair_recall": 0.7427,
+          "fp_pairs": 22
+        },
+        {
+          "tag": "shared_email",
+          "true_pairs": 2796,
+          "pair_recall": 0.765,
+          "fp_pairs": 2290
+        },
+        {
+          "tag": "stale_email",
+          "true_pairs": 2207,
+          "pair_recall": 0.8106,
+          "fp_pairs": 397
+        },
+        {
+          "tag": "typo",
+          "true_pairs": 3644,
+          "pair_recall": 0.9495,
+          "fp_pairs": 582
+        },
+        {
+          "tag": "within_source_dup",
+          "true_pairs": 301,
+          "pair_recall": 0.9867,
+          "fp_pairs": 35
+        }
+      ]
+    }
+  }
+}

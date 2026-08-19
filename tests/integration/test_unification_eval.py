@@ -19,12 +19,12 @@ pytestmark = pytest.mark.integration
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# Floors for the CI dataset, set just below the first observed run
-# (deterministic 0.9171/0.9309, full 0.8829/0.9956 — 2026-08-19); see module
-# docstring for the rules about changing them.
+# Floors for the CI dataset, set just below the observed run at the v3
+# operating point (deterministic 0.9171/0.9309, full 0.9193/0.9584 —
+# 2026-08-19); see module docstring for the rules about changing them.
 FLOORS = {
     "deterministic": {"precision": 0.89, "recall": 0.90},
-    "full": {"precision": 0.85, "recall": 0.97},
+    "full": {"precision": 0.90, "recall": 0.94},
 }
 
 

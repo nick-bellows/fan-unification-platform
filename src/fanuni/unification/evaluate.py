@@ -248,6 +248,92 @@ def run_eval(
     return report
 
 
+def run_threshold_sweep(
+    conn: psycopg.Connection[Any],
+    truth_path: Path,
+    out_dir: Path,
+    thresholds: tuple[float, ...] = (0.90, 0.95, 0.99, 0.999, 0.9999),
+    config: UnifyConfig | None = None,
+) -> list[dict[str, Any]]:
+    """Metrics at several auto-merge thresholds: how the operating point is
+    chosen. One Splink pass scores everything >= 0.5; each threshold then
+    slices the same predictions, so rows are directly comparable."""
+    from fanuni.unification.probabilistic import ProbabilisticResult
+
+    config = config or UnifyConfig()
+    records = fetch_identity_records(conn)
+    truth = load_truth(truth_path)
+
+    det = deterministic_clusters(records)
+    det_metrics, _, _ = pair_metrics(det, truth)
+    rows: list[dict[str, Any]] = [
+        {
+            "variant": "deterministic",
+            "threshold": None,
+            "precision": det_metrics.precision,
+            "recall": det_metrics.recall,
+            "f1": det_metrics.f1,
+            "auto_merge_edges": 0,
+            "review_band": 0,
+        }
+    ]
+
+    base_config = UnifyConfig(
+        auto_merge_threshold=0.5,
+        review_threshold=0.5,
+        em_max_pairs=config.em_max_pairs,
+        seed=config.seed,
+    )
+    scored = probabilistic_edges(records, base_config).edges
+    for threshold in thresholds:
+        kept = [e for e in scored if e.probability >= threshold]
+        combined = combine(records, det, ProbabilisticResult(edges=kept, review_band=[]))
+        metrics, _, _ = pair_metrics(combined.clusters, truth)
+        rows.append(
+            {
+                "variant": "full",
+                "threshold": threshold,
+                "precision": metrics.precision,
+                "recall": metrics.recall,
+                "f1": metrics.f1,
+                "auto_merge_edges": len(kept),
+                "review_band": sum(1 for e in scored if 0.5 <= e.probability < threshold),
+            }
+        )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# Auto-merge threshold sweep",
+        "",
+        f"- Unifier version: {UNIFIER_VERSION} · seed {config.seed} · {len(records)} records",
+        "- One Splink pass scored every pair >= 0.5; each row slices the same",
+        "  predictions at a different auto-merge threshold, against ground truth.",
+        "",
+        "| variant | threshold | precision | recall | F1 | merged edges | pairs below |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        threshold_label = "—" if row["threshold"] is None else f"{row['threshold']}"
+        lines.append(
+            f"| {row['variant']} | {threshold_label} | {row['precision']:.4f}"
+            f" | {row['recall']:.4f} | {row['f1']:.4f}"
+            f" | {row['auto_merge_edges']} | {row['review_band']} |"
+        )
+    lines += [
+        "",
+        "With many agreeing fields the Fellegi-Sunter posterior saturates near",
+        "1.0, so most false positives (households sharing email/surname/zip and",
+        "name+geography coincidences) still score above 0.999 — the useful",
+        "separation happens in the last decimal places. The default operating",
+        "point (`UnifyConfig.auto_merge_threshold`) was chosen from this table;",
+        "changing it means bumping UNIFIER_VERSION and regenerating this file",
+        "in the same commit.",
+        "",
+    ]
+    (out_dir / "threshold_sweep.md").write_text("\n".join(lines), encoding="utf-8")
+    return rows
+
+
 def _render_markdown(report: dict[str, Any]) -> str:
     lines = [
         "# Linkage evaluation",

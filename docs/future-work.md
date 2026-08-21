@@ -25,3 +25,16 @@ The single home for deferred ideas. Recorded, not committed to.
 - **Scale test.** Generate 100k fans / ~350k records and measure: COPY
   throughput, Splink blocking counts, model runtimes — the numbers that
   decide when full-rebuild staging stops being right.
+- **npm advisory disposition.** `npm audit --omit=dev` in `site/` reports ~31
+  transitive advisories inside the Evidence.dev toolchain. Accepted for now:
+  the output is a static site over synthetic data with no server runtime.
+  Revisit on each Evidence upgrade; an audit gate would mostly fail on
+  upstream noise we cannot patch.
+- **Versioned lake keys.** Corrected files currently overwrite their lake
+  object (replace semantics keep the warehouse clean), so an audit row can
+  reference bytes that were later replaced. Content-hashed object keys with
+  a latest-pointer would make the lake immutable at the cost of a more
+  complex replace path.
+- **Run provenance stamps.** Record git commit, generator-manifest hash, and
+  seeds in `ops.pipeline_runs.parameters` so any warehouse state can be tied
+  to exact inputs.

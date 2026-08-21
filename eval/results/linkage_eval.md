@@ -1,7 +1,7 @@
 # Linkage evaluation
 
 - Unifier version: 3
-- Evaluated: 2026-08-19T14:55:29.880521+00:00
+- Evaluated: 2026-08-21T15:20:20.061328+00:00
 - Records: 17487 · Review band: 3376 pairs
 - Config: {"auto_merge_threshold": 0.9999, "review_threshold": 0.999, "em_max_pairs": 4000000.0, "seed": 42}
 
@@ -25,3 +25,15 @@
 | stale_email | 2207 | 0.7367 | 0.8106 | 397 | 397 |
 | typo | 3644 | 0.7300 | 0.9495 | 470 | 582 |
 | within_source_dup | 301 | 0.9635 | 0.9867 | 35 | 35 |
+
+## Production boundary
+
+At this operating point ~15% of auto-merged pairs are wrong
+(precision 0.8485). That is measured evidence for a reference
+pipeline — it is **not** a precision at which unattended merging would be
+acceptable in production, where false identity merges carry asymmetric
+privacy and business costs. In production this operating point would keep
+probabilistic merges behind clerical review (the review band) or require
+stronger evidence (household modeling is the top future-work item). This
+repo demonstrates the mechanism and the measurement, not a matcher cleared
+for unattended use.

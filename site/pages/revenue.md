@@ -22,8 +22,12 @@ select * from fanuni.monthly_revenue
 select * from fanuni.revenue_by_match
 ```
 
+```sql matches_sold
+select * from ${matches} where ticket_revenue > 0
+```
+
 <BarChart
-  data={matches.where(`ticket_revenue > 0`)}
+  data={matches_sold}
   x=match_id
   y=ticket_revenue
   title="Ticket revenue by match"

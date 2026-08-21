@@ -368,5 +368,21 @@ def _render_markdown(report: dict[str, Any]) -> str:
             f" | {fmt(row['pair_recall'])} | {det_row.get('fp_pairs', 0)}"
             f" | {row['fp_pairs']} |"
         )
-    lines.append("")
+    full_precision = report["variants"]["full"]["metrics"]["precision"]
+    fp_share = round((1 - full_precision) * 100)
+    lines += [
+        "",
+        "## Production boundary",
+        "",
+        f"At this operating point ~{fp_share}% of auto-merged pairs are wrong",
+        f"(precision {full_precision:.4f}). That is measured evidence for a reference",
+        "pipeline — it is **not** a precision at which unattended merging would be",
+        "acceptable in production, where false identity merges carry asymmetric",
+        "privacy and business costs. In production this operating point would keep",
+        "probabilistic merges behind clerical review (the review band) or require",
+        "stronger evidence (household modeling is the top future-work item). This",
+        "repo demonstrates the mechanism and the measurement, not a matcher cleared",
+        "for unattended use.",
+        "",
+    ]
     return "\n".join(lines)

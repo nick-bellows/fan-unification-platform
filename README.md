@@ -42,7 +42,11 @@ Instead of quietly retuning, the repo commits the full
 [threshold sweep](eval/results/threshold_sweep.md) that shows the curve and
 selects the operating point from it — recall +3.1 pts and F1 +1.4 pts over
 the baseline at equal precision, with 3,376 uncertain pairs routed to
-clerical review rather than merged. Full report:
+clerical review rather than merged. And one boundary stated plainly: 84.9%
+precision means roughly one in seven auto-merged pairs is wrong — measured
+and useful for a reference pipeline, **not** a precision at which unattended
+merging would ship in production, where this operating point would keep
+probabilistic merges behind the review queue. Full report:
 [`eval/results/`](eval/results/) · per-mess-type breakdown on the
 [dashboard](https://nick-bellows.github.io/fan-unification-platform/unification).
 

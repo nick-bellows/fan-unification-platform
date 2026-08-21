@@ -15,10 +15,14 @@ qualify row_number() over (partition by variant order by id desc) = 1
 order by variant
 ```
 
-<BigValue data={eval_latest.where(`variant = 'full'`)} value=pair_precision title="Precision (full)" fmt="0.00%" />
-<BigValue data={eval_latest.where(`variant = 'full'`)} value=pair_recall title="Recall (full)" fmt="0.00%" />
-<BigValue data={eval_latest.where(`variant = 'full'`)} value=pair_f1 title="F1 (full)" fmt="0.00%" />
-<BigValue data={eval_latest.where(`variant = 'full'`)} value=review_band title="Review-band pairs" fmt="#,##0" />
+```sql eval_full
+select * from ${eval_latest} where variant = 'full'
+```
+
+<BigValue data={eval_full} value=pair_precision title="Precision (full)" fmt="0.00%" />
+<BigValue data={eval_full} value=pair_recall title="Recall (full)" fmt="0.00%" />
+<BigValue data={eval_full} value=pair_f1 title="F1 (full)" fmt="0.00%" />
+<BigValue data={eval_full} value=review_band title="Review-band pairs" fmt="#,##0" />
 
 ## Baseline vs probabilistic, head to head
 

@@ -38,10 +38,13 @@ jobs:
           cache-dependency-path: site/package-lock.json
       - run: npm ci
         working-directory: site
-      - run: npm run sources
+      - run: npm run sources:strict
         working-directory: site
-      - run: npm run build
+      - run: npm run build:strict
         working-directory: site
+      # A green build with empty tables is a presentation false-positive;
+      # assert every source in the deployable artifact actually has rows.
+      - run: python scripts/check_site_data.py
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/build

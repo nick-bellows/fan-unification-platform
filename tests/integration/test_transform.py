@@ -132,6 +132,8 @@ def test_stage5_analyst_role_cannot_read_pii(stack: Any, fresh_db: psycopg.Conne
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             conn.execute("SELECT email FROM marts.fan_360 LIMIT 1")
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            conn.execute("SELECT city FROM marts.fan_360 LIMIT 1")
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
             conn.execute("SELECT * FROM identity.golden_fans LIMIT 1")
     finally:
         conn.close()

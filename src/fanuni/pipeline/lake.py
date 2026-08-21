@@ -18,14 +18,19 @@ from fanuni.config import Settings
 
 
 def s3_client(settings: Settings) -> Any:
-    return boto3.client(
-        "s3",
-        endpoint_url=settings.s3_endpoint_url,
-        aws_access_key_id=settings.s3_access_key,
-        aws_secret_access_key=settings.s3_secret_key.get_secret_value(),
-        region_name="us-east-1",
-        config=Config(s3={"addressing_style": "path"}, retries={"max_attempts": 5}),
-    )
+    """Local default: MinIO endpoint + its static dev credentials. With
+    FANUNI_S3_ENDPOINT_URL set empty, no endpoint or static keys are passed
+    and boto3's normal credential chain (env, profile, IAM role) applies —
+    the real-AWS path."""
+    kwargs: dict[str, Any] = {
+        "region_name": "us-east-1",
+        "config": Config(s3={"addressing_style": "path"}, retries={"max_attempts": 5}),
+    }
+    if settings.s3_endpoint_url:
+        kwargs["endpoint_url"] = settings.s3_endpoint_url
+        kwargs["aws_access_key_id"] = settings.s3_access_key
+        kwargs["aws_secret_access_key"] = settings.s3_secret_key.get_secret_value()
+    return boto3.client("s3", **kwargs)
 
 
 def ensure_bucket(client: Any, bucket: str) -> None:

@@ -13,9 +13,10 @@ GRANT SELECT ON
   marts.cluster_sizes
 TO analyst;
 
--- fan_360 minus PII (no name, email, zip).
+-- fan_360 minus PII (no name, email, city, zip; state stays — coarse
+-- geography, consistent with the data dictionary's classification).
 GRANT SELECT (
-  fan_key, fan_id, city, state, sources, record_count,
+  fan_key, fan_id, state, sources, record_count,
   ticket_orders, seats, ticket_revenue,
   merch_orders, merch_revenue,
   membership_revenue, donation_revenue, total_revenue,

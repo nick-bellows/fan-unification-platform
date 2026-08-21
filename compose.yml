@@ -4,13 +4,13 @@ name: fanuni
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
     environment:
       POSTGRES_USER: fanuni
       POSTGRES_PASSWORD: fanuni_local
       POSTGRES_DB: fanuni
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,14 +20,14 @@ services:
       retries: 20
 
   minio:
-    image: minio/minio:latest
+    image: minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - miniodata:/data
     healthcheck:
@@ -40,10 +40,10 @@ services:
   # lake bucket via boto3, and a service that exits breaks `up --wait` on
   # some compose versions.
   prefect:
-    image: prefecthq/prefect:3-python3.12
+    image: prefecthq/prefect:3-python3.12@sha256:3ee8bd910cce51342ccb91f716303ad4b47303bd1fcce916f316dcd489d4d84a
     command: prefect server start --host 0.0.0.0
     ports:
-      - "4200:4200"
+      - "127.0.0.1:4200:4200"
     volumes:
       - prefectdata:/root/.prefect
     healthcheck:
@@ -64,7 +64,7 @@ services:
       context: .
       dockerfile: docker/salesforce-mock.Dockerfile
     ports:
-      - "8001:8001"
+      - "127.0.0.1:8001:8001"
     environment:
       FANUNI_SF_TOKEN: dev-local-token
       FANUNI_SF_DATA_DIR: /data/sfmock

@@ -12,7 +12,8 @@ PII classification: **[P]** personally identifying — withheld from the
 | first_name, last_name | text | **[P]** survived via modal value |
 | email | text | **[P]** latest-observed wins |
 | phone | text | **[P]** 10 digits |
-| city, state, zip | text | **[P]** modal |
+| city, zip | text | **[P]** modal |
+| state | text | [A] coarse geography (granted to analyst) |
 | dob | date | **[P]** CRM-sourced |
 | sources | text | [A] comma-joined source systems (type-1) |
 | record_count | int | [A] records in the cluster (type-1) |

@@ -21,4 +21,5 @@ variants for the hot tables are in `warehouse/redshift/`.
 What does **not** change: schema layout, the model runner and every model's
 shape (DROP+CTAS full rebuilds and the two incremental patterns), the dq
 check SQL, the unification interface tables, and all `boto3` lake code
-(drop `FANUNI_S3_ENDPOINT_URL` and it targets real S3).
+(set `FANUNI_S3_ENDPOINT_URL=""` and boto3's standard credential chain —
+env vars, profile, or IAM role — targets real S3; no static keys are passed).

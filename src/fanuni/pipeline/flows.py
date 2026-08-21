@@ -116,7 +116,11 @@ def ingest_salesforce(full_refresh: bool = False) -> dict[str, int]:
             db.audit_load(
                 conn, run_id, source_key, key, RAW_TABLES[source_key], loaded, len(rejects)
             )
-            db.set_watermark(conn, watermark_key, max(r["SystemModstamp"] for r in records))
+            # Advance the watermark only over ACCEPTED rows: advancing past a
+            # quarantined record would mean its corrected version (with an
+            # unchanged modstamp) could never be re-extracted incrementally.
+            if good:
+                db.set_watermark(conn, watermark_key, max(r["SystemModstamp"] for r in good))
             conn.commit()
             counts[source_key] = loaded
             logger.info("%s: loaded %d rows (%d quarantined)", sobject, loaded, len(rejects))

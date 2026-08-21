@@ -66,9 +66,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "info":
+        import re
+
         settings = load_settings()
+        masked_dsn = re.sub(r"(://[^:/@]+):[^@]+@", r"\1:***@", settings.database_url)
         print(f"fanuni {__version__}")
-        print(f"  database_url    = {settings.database_url}")
+        print(f"  database_url    = {masked_dsn}")
         print(f"  s3_endpoint_url = {settings.s3_endpoint_url}")
         print(f"  lake_bucket     = {settings.lake_bucket}")
         print(f"  sf_base_url     = {settings.sf_base_url}")
@@ -115,15 +118,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.select:
             from pathlib import Path
 
-            from fanuni.pipeline.db import connect, start_run
+            from fanuni.pipeline.db import connect, finish_run, start_run
             from fanuni.pipeline.sql_runner import run_models
 
             settings = load_settings()
             with connect(settings) as conn:
                 run_id = start_run(conn, "transform-select", {"select": args.select})
-                results = run_models(
-                    conn, Path(settings.warehouse_dir) / "models", run_id, select=args.select
-                )
+                try:
+                    results = run_models(
+                        conn, Path(settings.warehouse_dir) / "models", run_id, select=args.select
+                    )
+                except Exception:
+                    finish_run(conn, run_id, "failed")
+                    raise
+                finish_run(conn, run_id, "completed")
             for result in results:
                 print(f"{result.model.schema}.{result.model.table}: {result.rows} rows")
             return 0

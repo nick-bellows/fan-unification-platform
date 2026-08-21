@@ -106,8 +106,11 @@ SCHEMAS: dict[str, pa.DataFrameSchema] = {
             "created_at": _col(_matches(_ISO_TS)),
             "customer_email": _col(_EMAIL),
             "billing_name": _col(),
+            "sku": _col(),
+            "item_name": _col(),
             "quantity": _col(_NUMERIC_STRING),
             "unit_price": _col(_NUMERIC_STRING),
+            "line_total": _col(_NUMERIC_STRING),
             # Present pre-drift / post-drift respectively; the loader accepts both.
             "billing_zip": _col(required=False, nullable=True),
             "billing_postal_code": _col(required=False, nullable=True),

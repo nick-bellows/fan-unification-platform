@@ -101,6 +101,20 @@ def test_stage4_bad_rows_quarantine_with_reason(fresh_db: psycopg.Connection[Any
     # No duplication of the good rows despite the reload.
     assert _scalar(fresh_db, "SELECT count(*) FROM raw.ticketing_orders") == good_rows
 
+    # Correct the file (drop the bad row) and re-ingest: the stale quarantine
+    # entry must clear — a corrected file with zero rejects leaves no residue.
+    lines = target.read_text(encoding="utf-8").splitlines(keepends=True)
+    target.write_text("".join(line for line in lines if "T-999999" not in line), encoding="utf-8")
+    ingest_file_sources(sources=["ticketing_orders"])
+    assert (
+        _scalar(
+            fresh_db,
+            "SELECT count(*) FROM raw.quarantine WHERE source = 'ticketing_orders'",
+        )
+        == 0
+    )
+    assert _scalar(fresh_db, "SELECT count(*) FROM raw.ticketing_orders") == good_rows
+
 
 def test_stage5_backfill_window_filters_files(fresh_db: psycopg.Connection[Any]) -> None:
     from fanuni.pipeline.flows import ingest_file_sources

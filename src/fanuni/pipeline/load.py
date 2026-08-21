@@ -50,13 +50,15 @@ def quarantine_rows(
     batch_id: str,
     source_file: str,
 ) -> int:
-    if not rejects:
-        return 0
+    # Always clear the file's previous quarantine rows first: a corrected
+    # file that now has zero rejects must not leave stale quarantine behind.
     with conn.cursor() as cur:
         cur.execute(
             "DELETE FROM raw.quarantine WHERE source = %s AND source_file = %s",
             (source_key, source_file),
         )
+        if not rejects:
+            return 0
         with cur.copy(
             "COPY raw.quarantine (source, payload, reason, batch_id, source_file) FROM STDIN"
         ) as copy:

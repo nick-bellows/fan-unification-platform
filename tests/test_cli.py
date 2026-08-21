@@ -11,6 +11,9 @@ def test_info_prints_version_and_no_secrets(capsys: pytest.CaptureFixture[str]) 
     assert "database_url" in out
     assert "dev-local-token" not in out
     assert "minioadmin" not in out
+    # The DSN password is masked even though it's a local-only default.
+    assert "fanuni_local" not in out
+    assert ":***@" in out
 
 
 def test_version_flag(capsys: pytest.CaptureFixture[str]) -> None:

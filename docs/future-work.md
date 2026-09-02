@@ -25,11 +25,14 @@ The single home for deferred ideas. Recorded, not committed to.
 - **Scale test.** Generate 100k fans / ~350k records and measure: COPY
   throughput, Splink blocking counts, model runtimes — the numbers that
   decide when full-rebuild staging stops being right.
-- **npm advisory disposition.** `npm audit --omit=dev` in `site/` reports ~31
-  transitive advisories inside the Evidence.dev toolchain. Accepted for now:
-  the output is a static site over synthetic data with no server runtime.
-  Revisit on each Evidence upgrade; an audit gate would mostly fail on
-  upstream noise we cannot patch.
+- **npm advisory disposition.** On 2026-09-02, `npm audit --omit=dev` in `site/`
+  reported 34 transitive findings (7 critical, 8 high, 18 moderate, 1 low)
+  inside the latest available Evidence.dev 40.1.8 toolchain. The force-fix
+  recommendation is a breaking downgrade to Evidence 29.0.3, not a safe patch.
+  The current risk boundary is narrower—not eliminated—because CI builds a
+  static site from trusted synthetic data with no deployed Node server, secrets,
+  writes, or user-supplied records. Recheck each upstream release; replace the
+  presentation layer if a maintained dependency path does not emerge.
 - **Versioned lake keys.** Corrected files currently overwrite their lake
   object (replace semantics keep the warehouse clean), so an audit row can
   reference bytes that were later replaced. Content-hashed object keys with

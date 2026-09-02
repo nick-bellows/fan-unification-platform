@@ -2,6 +2,10 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
+if (-not $env:PREFECT_API_URL) {
+    $env:PREFECT_API_URL = "http://127.0.0.1:4200/api"
+}
+
 fanuni generate
 if ($LASTEXITCODE -ne 0) { exit 1 }
 fanuni init-db

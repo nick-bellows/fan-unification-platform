@@ -1,7 +1,7 @@
 # Linkage evaluation
 
 - Unifier version: 3
-- Evaluated: 2026-08-21T15:20:20.061328+00:00
+- Evaluated: 2026-09-02T22:13:25.760602+00:00
 - Records: 17487 · Review band: 3376 pairs
 - Config: {"auto_merge_threshold": 0.9999, "review_threshold": 0.999, "em_max_pairs": 4000000.0, "seed": 42}
 

@@ -27,6 +27,9 @@ site/node_modules/
 site/.evidence/
 site/build/
 site/.svelte-kit/
+site/test-results/
+site/playwright-report/
+test-results/
 
 # Terraform
 infra/terraform/.terraform/

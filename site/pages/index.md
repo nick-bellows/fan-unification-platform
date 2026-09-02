@@ -8,6 +8,10 @@ identity-resolution pipeline. **All data is synthetic** (seeded generator, no
 real persons) — which is exactly what makes the [unification accuracy](/unification)
 measurable against ground truth.
 
+> **New here?** [Start the three-minute record-lineage tour](/start) to follow
+> one generated source identity through matching, a golden record, SCD history,
+> a warehouse fact, and a BI-ready mart row—with direct links to the code and SQL.
+
 ```sql summary
 select * from fanuni.unification_summary
 ```
@@ -55,5 +59,6 @@ select *, conversion_pct / 100.0 as conversion_rate from fanuni.crossover
 
 ## Explore
 
+- [Start here: one record's lineage](/start) — source row to BI-ready result
 - [Unification quality](/unification) — measured precision/recall vs ground truth
 - [Revenue](/revenue) · [Engagement](/engagement) · [Pipeline ops](/ops)

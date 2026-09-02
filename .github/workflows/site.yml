@@ -45,6 +45,12 @@ jobs:
       # A green build with empty tables is a presentation false-positive;
       # assert every source in the deployable artifact actually has rows.
       - run: python scripts/check_site_data.py
+      # Source rows are necessary but not sufficient: exercise the built site
+      # in Chromium and assert that claim-bearing tables render visibly.
+      - run: npx playwright install --with-deps chromium
+        working-directory: site
+      - run: npm run test:rendered
+        working-directory: site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/build

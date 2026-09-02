@@ -17,6 +17,11 @@ vs probabilistic, head to head.
 **Live dashboards:** https://nick-bellows.github.io/fan-unification-platform/
 — built in CI from a real pipeline run, never hand-fed.
 
+**Three-minute reviewer tour:**
+https://nick-bellows.github.io/fan-unification-platform/start — follows one
+synthetic identity from source rows through match evidence, the golden record,
+SCD history, a warehouse fact, and a BI-ready mart row.
+
 [![Fan 360 overview](docs/assets/dashboard-home.jpg)](https://nick-bellows.github.io/fan-unification-platform/)
 [![Unification quality](docs/assets/dashboard-unification.jpg)](https://nick-bellows.github.io/fan-unification-platform/unification)
 
@@ -102,6 +107,7 @@ cd fan-unification-platform
 docker compose up -d --build --wait   # postgres, minio, prefect, mock salesforce
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\Activate.ps1
 pip install -e .
+export PREFECT_API_URL=http://127.0.0.1:4200/api
 
 fanuni generate            # synthetic sources + ground truth (~15 MB)
 fanuni init-db             # schemas, ops tables, grants
@@ -109,7 +115,12 @@ fanuni pipeline            # ingest -> transform -> unify -> quality gates
 fanuni evaluate            # score linkage against ground truth
 ```
 
-Prefect UI at `http://localhost:4200`, MinIO console at `:9001`. Dashboards
+In PowerShell, set the orchestration endpoint with
+`$env:PREFECT_API_URL = "http://127.0.0.1:4200/api"` instead of `export`.
+
+Prefect UI at `http://localhost:4200`, MinIO console at `:9001`. The
+`PREFECT_API_URL` setting above makes the displayed flow runs use that server.
+Dashboards
 locally: `cd site && npm install && npm run sources && npm run dev`.
 
 ## CI
@@ -119,8 +130,13 @@ locally: `cd site && npm install && npm run sources && npm run dev`.
 | `lint` / `typecheck` / `test` | ruff, mypy, 48 unit tests |
 | `integration` | 16 ordered stages against real services: full load reconciliation, re-run no-op, drift handling, quarantine, a gate that fails when data breaks, linkage-eval floors, PII grants |
 | `docker` / `gitleaks` / `terraform` | images build, no secrets in history, IaC validates |
-| `site` | Evidence dashboards build from a real pipeline run; deploys to Pages on `main` |
+| `site` | Evidence dashboards build from a real pipeline run; a Chromium gate checks rendered data and automated accessibility before Pages deploys on `main` |
 | `nightly-pipeline` (scheduled) | operating the pipeline: nightly end-to-end run with retained artifacts |
+
+**Known dashboard dependency boundary:** the latest Evidence.dev release still carries
+transitive npm advisories. The deployed artifact is static and contains only trusted synthetic
+data, which narrows but does not erase the risk. The measured disposition and replacement trigger
+are documented in [future work](docs/future-work.md); no breaking downgrade is hidden for a green badge.
 
 ## Documentation
 

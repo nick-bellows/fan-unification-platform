@@ -2,6 +2,9 @@
 
 .PHONY: check test up down demo
 
+PREFECT_API_URL ?= http://127.0.0.1:4200/api
+export PREFECT_API_URL
+
 demo: ## full local run: generate -> init-db -> pipeline -> evaluate
 	fanuni generate
 	fanuni init-db

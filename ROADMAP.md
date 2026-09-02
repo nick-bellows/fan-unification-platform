@@ -14,7 +14,13 @@ Last verified: 2026-09-02
 
 This repository already covers the highest-value Junior Data Engineer signals: heterogeneous ingestion, a Salesforce-shaped API, Prefect orchestration, incremental/idempotent loads, quarantine, explainable entity resolution, SCD2, data-quality checks, Redshift-oriented DDL, and BI marts. Do not replace that depth with a generic dashboard project.
 
-## Current milestone - five-minute data lineage tour
+## Completed milestone - five-minute data lineage tour
+
+Delivered and locally verified from a fresh 5,000-person synthetic generation on 2026-09-02.
+The site now includes a SQL-generated identity-to-mart trace, direct implementation links,
+rendered-data assertions at the GitHub Pages base path, and an automated WCAG A/AA check.
+The build hardening step also makes Evidence table scroll regions keyboard reachable. CI must
+pass before the refreshed Pages artifact is treated as deployed.
 
 Goal: make the existing implementation legible to a recruiter who will not run Docker or inspect every SQL model.
 
@@ -44,7 +50,7 @@ Vercel could host the same static output but adds no material hiring signal. Rep
 
 ## Next engineering milestone
 
-After the reviewer tour, take one evidence-led item from `docs/future-work.md`: household modeling, because shared contact details are the dominant observed false-merge source. Lock the current generator, splits, metrics, and thresholds before the experiment; publish the result even if it does not improve the baseline.
+Take one evidence-led item from `docs/future-work.md`: household modeling, because shared contact details are the dominant observed false-merge source. Lock the current generator, splits, metrics, and thresholds before the experiment; publish the result even if it does not improve the baseline.
 
 Deferred work, including Redshift burst deployment, Prefect Cloud, scale testing, and lake-key versioning, remains in `docs/future-work.md` and is not silently approved by this roadmap.
 

@@ -2,13 +2,14 @@
   "name": "fanuni-dashboards",
   "version": "0.0.1",
   "scripts": {
-    "build": "evidence build",
-    "build:strict": "evidence build:strict",
+    "build": "evidence build && python ../scripts/harden_site.py",
+    "build:strict": "evidence build:strict && python ../scripts/harden_site.py",
     "dev": "evidence dev --open /",
     "test": "evidence build",
     "sources": "evidence sources",
     "sources:strict": "evidence sources --strict",
-    "preview": "evidence preview"
+    "preview": "evidence preview",
+    "test:rendered": "playwright test"
   },
   "engines": {
     "npm": ">=7.0.0",
@@ -19,6 +20,10 @@
     "@evidence-dev/core-components": "^5.4.2",
     "@evidence-dev/evidence": "^40.1.8",
     "@evidence-dev/postgres": "^1.0.10"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1"
   },
   "overrides": {
     "typescript": "~5.8.0"

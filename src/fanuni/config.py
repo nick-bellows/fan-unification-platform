@@ -14,7 +14,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="FANUNI_", env_file=".env", extra="ignore")
 
-    database_url: str = "postgresql://fanuni:fanuni_local@localhost:5433/fanuni"
+    database_url: str = "postgresql://fanuni:fanuni_local@127.0.0.1:5433/fanuni"
 
     s3_endpoint_url: str = "http://localhost:9000"
     s3_access_key: str = "minioadmin"

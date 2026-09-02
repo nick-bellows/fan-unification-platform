@@ -128,6 +128,7 @@ locally: `cd site && npm install && npm run sources && npm run dev`.
 integration suite caught) · [Runbook](docs/runbook.md) ·
 [Data dictionary](docs/data-dictionary.md) ·
 [Redshift migration](docs/redshift-migration.md) ·
+[Interview guide](docs/INTERVIEW_GUIDE.md) ·
 [Interview brief](docs/interview-brief.md) ·
 [ADRs](docs/decisions/) · [Future work](docs/future-work.md)
 

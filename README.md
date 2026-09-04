@@ -22,6 +22,7 @@ https://nick-bellows.github.io/fan-unification-platform/start — follows one
 synthetic identity from source rows through match evidence, the golden record,
 SCD history, a warehouse fact, and a BI-ready mart row.
 
+[![One record's lineage — the three-minute tour](docs/assets/dashboard-lineage.jpg)](https://nick-bellows.github.io/fan-unification-platform/start)
 [![Fan 360 overview](docs/assets/dashboard-home.jpg)](https://nick-bellows.github.io/fan-unification-platform/)
 [![Unification quality](docs/assets/dashboard-unification.jpg)](https://nick-bellows.github.io/fan-unification-platform/unification)
 

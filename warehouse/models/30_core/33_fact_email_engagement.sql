@@ -1,22 +1,26 @@
 -- The incremental fact (the pattern shown once, deliberately): event grain,
--- append-only by event_id. Note the trade-off: if unification later reassigns
--- a subscriber to a different fan, rows already loaded keep their original
--- fan_key. Rebuild = DROP TABLE core.fact_email_engagement, then rerun.
+-- append-only by event_id. Campaign linkage stores the NATURAL key
+-- (campaign_id) rather than dim_campaign's row_number surrogate: the dim is
+-- rebuilt every run, so a late-arriving campaign would silently shift
+-- surrogate keys under previously loaded facts (external-review finding).
+-- Note the remaining trade-off: if unification later reassigns a subscriber
+-- to a different fan, rows already loaded keep their original fan_key.
+-- Rebuild = DROP TABLE core.fact_email_engagement, then rerun.
 CREATE TABLE IF NOT EXISTS core.fact_email_engagement (
   event_id     text PRIMARY KEY,
   fan_key      bigint NOT NULL,
-  campaign_key integer NOT NULL,
+  campaign_id  text NOT NULL,
   date_key     integer NOT NULL,
   event_type   text NOT NULL,
   occurred_at  timestamptz NOT NULL
 );
 
 INSERT INTO core.fact_email_engagement
-  (event_id, fan_key, campaign_key, date_key, event_type, occurred_at)
+  (event_id, fan_key, campaign_id, date_key, event_type, occurred_at)
 SELECT
   e.event_id,
   f.fan_key,
-  c.campaign_key,
+  e.campaign_id,
   to_char(e.occurred_at, 'YYYYMMDD')::int,
   e.event_type,
   e.occurred_at

@@ -7,7 +7,6 @@ pointing the identical code at AWS S3 means dropping the endpoint override
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import boto3
@@ -42,17 +41,6 @@ def ensure_bucket(client: Any, bucket: str) -> None:
 
 def put_bytes(client: Any, bucket: str, key: str, body: bytes) -> None:
     client.put_object(Bucket=bucket, Key=key, Body=body)
-
-
-def put_jsonl(client: Any, bucket: str, key: str, rows: list[dict[str, Any]]) -> int:
-    body = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows).encode("utf-8")
-    put_bytes(client, bucket, key, body)
-    return len(body)
-
-
-def get_bytes(client: Any, bucket: str, key: str) -> bytes:
-    body: bytes = client.get_object(Bucket=bucket, Key=key)["Body"].read()
-    return body
 
 
 def list_keys(client: Any, bucket: str, prefix: str) -> list[str]:

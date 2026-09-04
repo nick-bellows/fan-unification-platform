@@ -41,13 +41,13 @@ SORTKEY (date_key);
 CREATE TABLE core.fact_email_engagement (
   event_id     varchar(16) NOT NULL,
   fan_key      bigint NOT NULL,
-  campaign_key integer NOT NULL,
+  campaign_id  varchar(16) NOT NULL,
   date_key     integer NOT NULL,
   event_type   varchar(8) NOT NULL,
   occurred_at  timestamptz NOT NULL
 )
 DISTKEY (fan_key)
-SORTKEY (date_key, campaign_key);
+SORTKEY (date_key, campaign_id);
 
 -- Small dimensions distribute everywhere so joins never shuffle them.
 -- dim_date / dim_match / dim_product / dim_campaign: DISTSTYLE ALL,

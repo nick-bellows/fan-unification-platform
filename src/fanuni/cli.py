@@ -1,8 +1,5 @@
-"""Command-line entry point.
-
-Subcommands are added as milestones land; `info` exists from M0 so the
-installed console script is verifiable from day one.
-"""
+"""Command-line entry point for the fanuni pipeline: generate, init-db,
+ingest, transform, unify, dq, evaluate, and the full nightly `pipeline` run."""
 
 from __future__ import annotations
 

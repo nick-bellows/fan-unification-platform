@@ -1,5 +1,5 @@
 from fanuni.pipeline.contracts import validate_rows
-from fanuni.pipeline.flows import batch_month, parse_rows
+from fanuni.pipeline.flows import batch_month, next_watermark, parse_rows
 from fanuni.pipeline.salesforce import build_soql
 
 
@@ -85,3 +85,23 @@ def test_validate_rows_accepts_both_merch_schemas() -> None:
     for row in (pre, post):
         good, bad = validate_rows("merch_order_items", [row])
         assert bad == [] and len(good) == 1
+
+
+def test_next_watermark_advances_over_clean_accepts() -> None:
+    assert next_watermark(["t1", "t2"], [], None) == "t2"
+    assert next_watermark(["t1", "t2"], [], "t1") == "t2"
+
+
+def test_next_watermark_never_passes_a_rejected_row() -> None:
+    # Reject at t1, accept at t2: advancing to t2 would strand the corrected
+    # t1 row (same modstamp) forever — the exact review finding.
+    assert next_watermark(["t2"], ["t1"], None) is None
+    # Accepts strictly before the earliest reject are safe.
+    assert next_watermark(["t0", "t2"], ["t1"], None) == "t0"
+    assert next_watermark(["t0", "t2"], ["t1", "t3"], None) == "t0"
+
+
+def test_next_watermark_does_not_regress_or_move_without_accepts() -> None:
+    assert next_watermark([], ["t1"], "t5") is None
+    assert next_watermark([], [], None) is None
+    assert next_watermark(["t3"], [], "t5") is None  # never move backwards

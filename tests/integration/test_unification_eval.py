@@ -77,3 +77,27 @@ def test_eval_lands_on_ops_tables(
     assert {r[0] for r in rows} == {"deterministic", "full"}
     tags = fresh_db.execute("SELECT count(*) FROM ops.linkage_eval_tags").fetchone()
     assert tags is not None and tags[0] > 0
+
+
+def test_persisted_xref_matches_recomputed_clusters(
+    fresh_db: psycopg.Connection[Any], eval_report: dict[str, Any]
+) -> None:
+    """The published metrics score a recomputation; this pins the persisted
+    identity.fan_xref (what the warehouse actually consumes) to the same
+    cluster partition, so a materialization defect cannot hide behind a
+    green evaluation (external-review finding)."""
+    from fanuni.unification.deterministic import deterministic_clusters
+    from fanuni.unification.probabilistic import combine, probabilistic_edges
+    from fanuni.unification.records import fetch_identity_records
+
+    records = fetch_identity_records(fresh_db)
+    combined = combine(records, deterministic_clusters(records), probabilistic_edges(records))
+    recomputed = {frozenset(members) for members in combined.clusters.values()}
+
+    rows = fresh_db.execute(
+        "SELECT fan_id, source_system || ':' || source_record_id FROM identity.fan_xref"
+    ).fetchall()
+    persisted: dict[str, set[str]] = {}
+    for fan_id, ref in rows:
+        persisted.setdefault(fan_id, set()).add(ref)
+    assert {frozenset(refs) for refs in persisted.values()} == recomputed

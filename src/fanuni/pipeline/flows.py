@@ -58,6 +58,29 @@ def batch_month(file_name: str) -> str | None:
     return match.group(1) if match else None
 
 
+def next_watermark(accepted: list[str], rejected: list[str], current: str | None) -> str | None:
+    """The highest modstamp that is safe to claim as fully processed.
+
+    A quarantined row must stay re-extractable, and its corrected version
+    keeps the same SystemModstamp — so the watermark may only advance across
+    accepted rows that precede the EARLIEST rejected row. (External review
+    caught the earlier version advancing past rejects that had later accepted
+    neighbors.) Returns None when the watermark must not move; a standing
+    reject therefore holds the watermark until the upstream row is fixed,
+    which trades re-extraction volume for never losing a correction.
+    """
+    if not accepted:
+        return None
+    ceiling = min(rejected) if rejected else None
+    safe = [stamp for stamp in accepted if ceiling is None or stamp < ceiling]
+    if not safe:
+        return None
+    candidate = max(safe)
+    if current is not None and candidate <= current:
+        return None
+    return candidate
+
+
 def parse_rows(fmt: str, body: bytes) -> list[dict[str, Any]]:
     text = body.decode("utf-8")
     if fmt == "jsonl":
@@ -116,11 +139,13 @@ def ingest_salesforce(full_refresh: bool = False) -> dict[str, int]:
             db.audit_load(
                 conn, run_id, source_key, key, RAW_TABLES[source_key], loaded, len(rejects)
             )
-            # Advance the watermark only over ACCEPTED rows: advancing past a
-            # quarantined record would mean its corrected version (with an
-            # unchanged modstamp) could never be re-extracted incrementally.
-            if good:
-                db.set_watermark(conn, watermark_key, max(r["SystemModstamp"] for r in good))
+            new_watermark = next_watermark(
+                [r["SystemModstamp"] for r in good],
+                [row["SystemModstamp"] for row, _reason in rejects],
+                after,
+            )
+            if new_watermark is not None:
+                db.set_watermark(conn, watermark_key, new_watermark)
             conn.commit()
             counts[source_key] = loaded
             logger.info("%s: loaded %d rows (%d quarantined)", sobject, loaded, len(rejects))

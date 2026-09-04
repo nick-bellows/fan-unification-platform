@@ -12,6 +12,12 @@ WITH first_ticket AS (
   SELECT fan_key, min(purchased_at) AS first_ticket_at
   FROM core.fact_ticket_sales GROUP BY fan_key
 ),
+-- Right-censoring guard (external-review finding): a fan whose 90-day window
+-- extends past the last observable merch activity cannot be scored yet, and
+-- counting them as non-converters showed late cohorts as fake 0% rows.
+observable AS (
+  SELECT max(created_at) AS max_observed FROM core.fact_merch_sales
+),
 conversion AS (
   SELECT
     f.fan_key,
@@ -22,6 +28,8 @@ conversion AS (
     ON ms.fan_key = f.fan_key
    AND ms.created_at >= f.first_ticket_at
    AND ms.created_at < f.first_ticket_at + interval '90 days'
+  WHERE f.first_ticket_at + interval '90 days'
+          <= (SELECT max_observed FROM observable)
   GROUP BY f.fan_key, date_trunc('month', f.first_ticket_at)::date
 )
 SELECT

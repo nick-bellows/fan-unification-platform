@@ -27,8 +27,14 @@ test("lineage tour renders source, warehouse, fact, and mart evidence", async ({
   await expect(
     page.getByText(/evidence|probabilistic score met|deterministic cluster edge/).first(),
   ).toBeVisible();
-  await expect(page.locator("table:visible")).toHaveCount(4);
+  await expect(page.locator("table:visible")).toHaveCount(5);
   expect(await page.locator("table:visible td").count()).toBeGreaterThanOrEqual(7);
+  // The featured cluster must be truth-verified as ONE person, and the
+  // false-merge anatomy must be present and labeled (external-review fix).
+  await expect(page.getByText(/true\s+identity/i).first()).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Anatomy of a false merge" }),
+  ).toBeVisible();
 });
 
 for (const check of [

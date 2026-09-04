@@ -21,6 +21,23 @@ select * from fanuni.unification_summary
 <BigValue data={summary} value=records_per_fan title="Records per fan" />
 <BigValue data={summary} value=multi_source_fans title="Multi-source fans" fmt="#,##0" />
 
+```sql eval_full_latest
+select pair_precision, pair_recall, pair_f1, review_band
+from fanuni.linkage_eval
+where variant = 'full'
+qualify row_number() over (order by id desc) = 1
+```
+
+<BigValue data={eval_full_latest} value=pair_precision title="Pair precision" fmt="0.0%" />
+<BigValue data={eval_full_latest} value=pair_recall title="Pair recall" fmt="0.0%" />
+<BigValue data={eval_full_latest} value=pair_f1 title="Pair F1" fmt="0.0%" />
+<BigValue data={eval_full_latest} value=review_band title="Pairs sent to review" fmt="#,##0" />
+
+Measured against generator ground truth on every run — including the result
+that didn't flatter: at the naive threshold the probabilistic pass **lost** to
+plain deterministic rules, and the committed sweep that chose the operating
+point is published in full. [Baseline vs probabilistic, head to head →](/unification)
+
 ## Revenue across every pillar
 
 Ticketing, merch, memberships, and donations live in four different source
@@ -44,6 +61,8 @@ select * from fanuni.monthly_revenue
 
 Of fans whose first ticket purchase fell in a month, the share who bought
 merch within 90 days — the cross-sell question unification exists to answer.
+Fans without a complete 90-day observation window are excluded, so the tail
+is censored honestly instead of reading as zero conversion.
 
 ```sql crossover
 select *, conversion_pct / 100.0 as conversion_rate from fanuni.crossover

@@ -41,3 +41,14 @@ The single home for deferred ideas. Recorded, not committed to.
 - **Run provenance stamps.** Record git commit, generator-manifest hash, and
   seeds in `ops.pipeline_runs.parameters` so any warehouse state can be tied
   to exact inputs.
+- **Supply-chain pinning (2026-09-04 external review).** GitHub Actions use
+  mutable major tags rather than commit SHAs, and Python dependencies are
+  lower-bounded without a lockfile, so CI installs are not byte-reproducible.
+  Portfolio-acceptable, production blocker. The gitleaks download is now
+  checksum-verified and container images digest-pinned; SHA-pinning ~10
+  action refs and adding a lock/constraints file is the remaining step.
+- **Dark-theme contrast.** Independent Axe checks found 4.46:1 (needs 4.5:1)
+  on Evidence's blockquote text and pagination inputs in dark mode; light
+  mode passes everywhere. The failing styles are Evidence-internal; fix via a
+  theme override or upstream, and add a dark-mode pass to the Playwright
+  WCAG test when done.

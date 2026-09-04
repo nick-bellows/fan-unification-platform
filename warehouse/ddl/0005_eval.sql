@@ -18,6 +18,19 @@ CREATE TABLE IF NOT EXISTS ops.linkage_eval (
   review_band        integer NOT NULL DEFAULT 0
 );
 
+-- Per-cluster truth classification, so presentation layers (the lineage
+-- tour) can label what they show instead of guessing. Pipeline code never
+-- reads this; only the eval harness writes it and the site build reads it.
+CREATE TABLE IF NOT EXISTS ops.linkage_cluster_truth (
+  fan_id            text PRIMARY KEY,
+  member_count      integer NOT NULL,
+  true_entity_count integer NOT NULL,
+  is_pure           boolean NOT NULL,   -- every member maps to ONE true entity
+  has_probabilistic boolean NOT NULL,
+  unifier_version   text NOT NULL,
+  evaluated_at      timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS ops.linkage_eval_tags (
   id              bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   evaluated_at    timestamptz NOT NULL DEFAULT now(),

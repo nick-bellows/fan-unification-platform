@@ -48,6 +48,9 @@ select * from ${matches} where ticket_revenue > 0
 
 ## Ticket → merch cohorts
 
+Cohorts without a complete 90-day observation window are excluded (censored,
+not counted as zero conversion).
+
 ```sql crossover
 select * from fanuni.crossover
 ```

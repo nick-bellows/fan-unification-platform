@@ -26,8 +26,8 @@ SCD history, a warehouse fact, and a BI-ready mart row.
 [![Fan 360 overview](docs/assets/dashboard-home.jpg)](https://nick-bellows.github.io/fan-unification-platform/)
 [![Unification quality](docs/assets/dashboard-unification.jpg)](https://nick-bellows.github.io/fan-unification-platform/unification)
 
-> **All data is synthetic** (seeded generator, no real persons; emails end in
-> `example.com`). No LLM is used anywhere in the runtime path — the
+> **All data is synthetic** (seeded generator, no real persons; emails use reserved
+> example domains: `example.com`/`.net`/`.org`). No LLM is used anywhere in the runtime path — the
 > probabilistic matcher is classical Fellegi-Sunter statistics.
 
 ## The honest headline
@@ -105,12 +105,14 @@ What each layer demonstrates:
 ```sh
 git clone https://github.com/nick-bellows/fan-unification-platform
 cd fan-unification-platform
-docker compose up -d --build --wait   # postgres, minio, prefect, mock salesforce
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\Activate.ps1
 pip install -e .
 export PREFECT_API_URL=http://127.0.0.1:4200/api
 
-fanuni generate            # synthetic sources + ground truth (~15 MB)
+fanuni generate            # synthetic sources + ground truth (~15 MB) — BEFORE
+                           # compose up, so the bind-mounted data/ dirs are
+                           # yours, not root-owned (matters on Linux)
+docker compose up -d --build --wait   # postgres, minio, prefect, mock salesforce
 fanuni init-db             # schemas, ops tables, grants
 fanuni pipeline            # ingest -> transform -> unify -> quality gates
 fanuni evaluate            # score linkage against ground truth
@@ -147,6 +149,7 @@ integration suite caught) · [Runbook](docs/runbook.md) ·
 [Redshift migration](docs/redshift-migration.md) ·
 [Interview guide](docs/INTERVIEW_GUIDE.md) ·
 [Interview brief](docs/interview-brief.md) ·
+[AI-assisted development](docs/ai-assisted-development.md) ·
 [ADRs](docs/decisions/) · [Future work](docs/future-work.md)
 
 ## License

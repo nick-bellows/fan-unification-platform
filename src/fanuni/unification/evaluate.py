@@ -156,6 +156,42 @@ def _write_review_csv(
             writer.writerow(row)
 
 
+def _write_cluster_truth(
+    conn: psycopg.Connection[Any],
+    combined: CombinedClusters,
+    truth: dict[str, tuple[str, list[str]]],
+) -> None:
+    """Persist per-cluster truth classification to ops.linkage_cluster_truth.
+
+    This lets the site's lineage tour label its featured cluster honestly
+    (pure vs false merge) instead of asserting "one fan" unverified — the
+    external-review finding. Only the eval harness may read ground truth;
+    the pipeline never reads this table.
+    """
+    from fanuni.unification.golden import fan_id_for
+
+    with conn.cursor() as cur:
+        cur.execute("TRUNCATE ops.linkage_cluster_truth")
+        with cur.copy(
+            "COPY ops.linkage_cluster_truth"
+            " (fan_id, member_count, true_entity_count, is_pure,"
+            "  has_probabilistic, unifier_version) FROM STDIN"
+        ) as copy:
+            for members in combined.clusters.values():
+                entities = {truth[ref][0] if ref in truth else f"unknown:{ref}" for ref in members}
+                copy.write_row(
+                    (
+                        fan_id_for(members),
+                        len(members),
+                        len(entities),
+                        len(entities) == 1,
+                        any(combined.method_by_ref.get(ref) == "probabilistic" for ref in members),
+                        UNIFIER_VERSION,
+                    )
+                )
+    conn.commit()
+
+
 def run_eval(
     conn: psycopg.Connection[Any],
     truth_path: Path,
@@ -178,6 +214,7 @@ def run_eval(
     full_tags = tag_breakdown(truth, combined.clusters, full_fp, full_fn)
 
     _write_review_csv(review_dir / "review_pairs.csv", records, combined, prob.review_band)
+    _write_cluster_truth(conn, combined, truth)
 
     evaluated_at = datetime.now(UTC).isoformat()
     report: dict[str, Any] = {

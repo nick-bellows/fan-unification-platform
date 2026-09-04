@@ -21,6 +21,11 @@ The site now includes a SQL-generated identity-to-mart trace, direct implementat
 rendered-data assertions at the GitHub Pages base path, and an automated WCAG A/AA check.
 The build hardening step also makes Evidence table scroll regions keyboard reachable. CI must
 pass before the refreshed Pages artifact is treated as deployed.
+2026-09-04, after external review: the featured cluster is now verified
+**truth-pure** at build time (via `ops.linkage_cluster_truth`, written by the
+eval harness), and the tour gained a deliberately labeled "Anatomy of a false
+merge" section — the previous selection preferred the largest probabilistic
+cluster, which showcased a household false merge as one fan.
 
 Goal: make the existing implementation legible to a recruiter who will not run Docker or inspect every SQL model.
 

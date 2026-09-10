@@ -1,10 +1,15 @@
-# Keeps the SHA-pinned action refs in .github/workflows current. Python pins
-# live in constraints.txt and are regenerated deliberately (see its header);
-# the npm tree is dispositioned in docs/future-work.md.
+# Keeps the SHA-pinned action refs in .github/workflows current. Updates
+# arrive as ONE grouped pull request so paired actions (Pages upload/deploy)
+# are bumped and CI-tested together. Python pins live in constraints.txt and
+# are regenerated deliberately (see its header); the npm tree is dispositioned
+# in docs/future-work.md.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      github-actions:
+        patterns: ["*"]
     labels: [dependencies]

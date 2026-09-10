@@ -50,12 +50,23 @@ for (const check of [
   });
 }
 
-test("reviewer routes have no automated WCAG A/AA violations", async ({ page }) => {
-  for (const route of ["/", "/start", "/unification", "/ops", "/revenue"]) {
-    await openRenderedPage(page, route);
-    const results = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .analyze();
-    expect(results.violations, `${route} accessibility violations`).toEqual([]);
-  }
-});
+// Both appearances are checked: the site follows the visitor's system theme
+// (evidence.config.yaml `appearance.default: system`), and an earlier
+// independent Axe pass found dark-mode-only contrast failures in
+// Evidence-internal styles that the light pass could never see.
+for (const scheme of ["light", "dark"] as const) {
+  test(`reviewer routes have no automated WCAG A/AA violations (${scheme} theme)`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    for (const route of ["/", "/start", "/unification", "/ops", "/revenue"]) {
+      await openRenderedPage(page, route);
+      // Guard against a silent no-op: the shell must actually be in this theme.
+      await expect(page.locator("html")).toHaveAttribute("data-theme", scheme);
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(results.violations, `${route} ${scheme}-theme accessibility violations`).toEqual([]);
+    }
+  });
+}

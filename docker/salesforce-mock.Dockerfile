@@ -6,7 +6,9 @@ FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir "fastapi>=0.111" "uvicorn>=0.30" \
+# Same reviewed pins as CI: constraints.txt is the single lock for the repo.
+COPY constraints.txt ./
+RUN pip install --no-cache-dir -c constraints.txt "fastapi>=0.111" "uvicorn>=0.30" \
     "pydantic>=2.7" "pydantic-settings>=2.3" "python-multipart>=0.0.9"
 
 COPY pyproject.toml README.md ./

@@ -1,6 +1,6 @@
 # Roadmap
 
-Last verified: 2026-09-04
+Last verified: 2026-09-10
 
 ## Handoff snapshot
 
@@ -87,11 +87,17 @@ who must do them.
    impure clusters; the tour now displays the worst one). Lock the current
    generator, splits, metrics, and thresholds before the experiment; publish
    the result even if it does not beat the baseline.
-3. **Supply-chain finishers** (~half day): SHA-pin GitHub Actions, add a
-   Python lock/constraints file. Dispositioned in `docs/future-work.md`;
-   portfolio-acceptable as-is.
-4. **Dark-mode contrast fix** (Evidence-internal 4.46:1 vs 4.5:1 on
-   blockquote/pagination) plus a dark-mode pass in the Playwright WCAG test.
+Done 2026-09-10, on the author's instruction to complete the project (no
+behavior, number, or claim changed):
+
+- **Supply-chain finishers.** Every GitHub Action ref is SHA-pinned with its
+  version in a comment (Dependabot keeps them current); `constraints.txt`
+  locks CI, the nightly run, and the mock image to one reviewed dependency
+  set, generated with `uv pip compile` and regenerated deliberately.
+- **Dark-mode contrast.** The 4.46:1 failure (Evidence's derived muted text
+  on the blockquote background) is fixed with a `base-content-muted` theme
+  override; the Playwright WCAG test now runs every reviewer route in both
+  light and dark and asserts the shell is really in each theme.
 
 All other deferred work (Redshift burst deployment, Prefect Cloud, scale
 testing, lake-key versioning, adversarial CRM-timestamp fixtures) remains in

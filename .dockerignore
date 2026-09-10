@@ -1,0 +1,15 @@
+# The only image built from this context is the mock Salesforce API
+# (docker/salesforce-mock.Dockerfile); it needs pyproject.toml, README.md,
+# constraints.txt and src/. Everything else stays out of the build context.
+.git
+.venv
+.github
+data
+docs
+eval
+infra
+site
+tests
+warehouse
+**/__pycache__
+*.egg-info

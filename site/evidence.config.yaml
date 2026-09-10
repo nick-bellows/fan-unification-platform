@@ -45,6 +45,12 @@ theme:
     base:
       light: "#ffffff"
       dark: "#09090b"
+    # Evidence derives the dark muted text as #7b7b7c, which is 4.46:1 on the
+    # base-200 blockquote background (WCAG AA needs 4.5:1). #929294 clears
+    # 4.5:1 on base-100, base-200 and base-300; light stays derived. The
+    # Playwright WCAG test asserts this in both themes.
+    base-content-muted:
+      dark: "#929294"
     info:
       light: "#0284c7"
       dark: "#38bdf8"

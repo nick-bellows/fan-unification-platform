@@ -106,7 +106,7 @@ What each layer demonstrates:
 git clone https://github.com/nick-bellows/fan-unification-platform
 cd fan-unification-platform
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\Activate.ps1
-pip install -e .
+pip install -c constraints.txt -e .   # constraints.txt = the reviewed lock CI uses
 export PREFECT_API_URL=http://127.0.0.1:4200/api
 
 fanuni generate            # synthetic sources + ground truth (~15 MB) — BEFORE

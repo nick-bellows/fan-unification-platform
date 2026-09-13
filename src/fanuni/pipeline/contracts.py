@@ -46,8 +46,13 @@ _POSITIVE_NUMBER = pa.Check(
     error="must be a positive number",
 )
 
+_DECIMAL = re.compile(r"^\d+(\.\d+)?$")
+
+# Match, never cast: float("two") would raise inside the check, and pandera
+# reports a raised check without a row index — quarantining the whole file
+# for one bad cell instead of the one row.
 _NUMERIC_STRING = pa.Check(
-    lambda v: isinstance(v, str) and v != "" and float(v) >= 0,
+    lambda v: isinstance(v, str) and bool(_DECIMAL.match(v)),
     element_wise=True,
     error="must be a non-negative numeric string",
 )

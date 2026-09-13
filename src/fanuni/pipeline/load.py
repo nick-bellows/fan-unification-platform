@@ -43,6 +43,26 @@ def replace_batch(
     return len(rows)
 
 
+def supersede_quarantine(
+    conn: psycopg.Connection[Any], source_key: str, id_field: str, ids: list[str]
+) -> int:
+    """Drop quarantine rows for records that a newer extract has re-delivered.
+
+    API sources are keyed per extract (the lake key carries the run time), so
+    the per-file clearing in quarantine_rows never matches an earlier run.
+    Without this, a standing reject gains one quarantine row per run and a
+    corrected record leaves its old rows behind forever.
+    """
+    if not ids:
+        return 0
+    with conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM raw.quarantine WHERE source = %s AND payload->>%s = ANY(%s)",
+            (source_key, id_field, ids),
+        )
+        return cur.rowcount
+
+
 def quarantine_rows(
     conn: psycopg.Connection[Any],
     source_key: str,

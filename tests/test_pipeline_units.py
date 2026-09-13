@@ -87,6 +87,27 @@ def test_validate_rows_accepts_both_merch_schemas() -> None:
         assert bad == [] and len(good) == 1
 
 
+def test_validate_rows_quarantines_only_the_non_numeric_row() -> None:
+    base = {
+        "order_number": "M-000001",
+        "created_at": "2025-10-01T10:00:00Z",
+        "customer_email": "a@example.com",
+        "billing_name": "A Example",
+        "billing_zip": "75001",
+        "sku": "SCARF-CL",
+        "item_name": "Classic Scarf",
+        "quantity": "1",
+        "unit_price": "24.99",
+        "line_total": "24.99",
+    }
+    rows = [base, dict(base, order_number="M-000002", quantity="two")]
+    good, bad = validate_rows("merch_order_items", rows)
+    # A cast that raises inside the check used to reject the whole file.
+    assert [r["order_number"] for r in good] == ["M-000001"]
+    assert len(bad) == 1 and bad[0][0]["order_number"] == "M-000002"
+    assert "quantity" in bad[0][1]
+
+
 def test_next_watermark_advances_over_clean_accepts() -> None:
     assert next_watermark(["t1", "t2"], [], None) == "t2"
     assert next_watermark(["t1", "t2"], [], "t1") == "t2"
@@ -105,3 +126,10 @@ def test_next_watermark_does_not_regress_or_move_without_accepts() -> None:
     assert next_watermark([], ["t1"], "t5") is None
     assert next_watermark([], [], None) is None
     assert next_watermark(["t3"], [], "t5") is None  # never move backwards
+
+
+def test_next_watermark_holds_when_a_reject_has_no_stamp() -> None:
+    # A reject can lack SystemModstamp (that may be why it was rejected);
+    # its position is unknowable, so nothing may advance past it.
+    assert next_watermark(["t0", "t2"], [None], None) is None
+    assert next_watermark(["t0", "t2"], [None, "t1"], None) is None

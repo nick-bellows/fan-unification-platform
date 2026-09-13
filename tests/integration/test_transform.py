@@ -143,13 +143,19 @@ def test_stage6_household_email_shows_expected_overmerge(
     fresh_db: psycopg.Connection[Any],
 ) -> None:
     """The deterministic pass knowingly merges household members who share an
-    email. Confirm the mechanism exists (clusters spanning multiple distinct
-    folded first names) — M4 measures its precision cost against ground truth."""
+    email. Confirm the mechanism exists: clusters whose records carry several
+    distinct first names — M4 measures its precision cost against ground truth."""
     row = fresh_db.execute(
         """
-        SELECT count(*)
-        FROM identity.golden_fans
-        WHERE record_count >= 3
+        SELECT count(*) FROM (
+          SELECT x.fan_id
+          FROM identity.fan_xref x
+          JOIN staging.identity_records r
+            ON r.source_system = x.source_system
+           AND r.source_record_id = x.source_record_id
+          GROUP BY x.fan_id
+          HAVING count(DISTINCT lower(trim(r.first_name))) >= 2
+        ) multi_name
         """
     ).fetchone()
     assert row is not None and row[0] > 0

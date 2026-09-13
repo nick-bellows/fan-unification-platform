@@ -74,6 +74,16 @@ def test_query_paginates_like_an_extractor_would(
         headers=headers,
     )
     assert stamps_body.status_code == 200
+    stamps = [r["SystemModstamp"] for r in stamps_body.json()["records"]]
+    assert stamps == sorted(stamps)
+
+    # A syntactically valid cursor with the wrong shape is a client error,
+    # not a server crash.
+    import base64
+
+    forged = base64.urlsafe_b64encode(b'{"sobject": "Contact"}').decode()
+    bad = client.get(f"/services/data/v59.0/query/{forged}", headers=headers)
+    assert bad.status_code == 400
 
 
 def test_watermark_filter(client: TestClient) -> None:

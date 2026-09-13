@@ -57,8 +57,9 @@ found via `pg_stat_activity`, fixed with autocommit on the test fixture.
 
 Deterministic pass (email exact; phone+surname) through union-find, then
 Splink 4 on DuckDB (ADR 0004) with folded/canonicalized names, EM-trained,
-seeded for reproducibility. High-confidence pairs merge; the 0.5–0.9 band
-goes to clerical review. fan_ids derive from the minimum member ref, so
+seeded for reproducibility. Pairs above the auto-merge threshold merge; the
+band between the review and auto-merge thresholds (0.999–0.9999 at the v3
+operating point) goes to clerical review. fan_ids derive from the minimum member ref, so
 stable clusters keep their ids across runs.
 
 The eval harness scores both variants against ground truth on every CI run,
@@ -92,7 +93,7 @@ The performance pass came from the audit trail: `ops.model_runs` showed the
 crossover mart at 10× the next slowest model; `EXPLAIN ANALYZE` blamed a
 correlated `EXISTS` (2,724 sequential scans of the merch fact, ~14M row
 visits). Rewritten as a hash join after a row-for-row equivalence check:
-506 ms → 3.6 ms, model build 2,048 ms → 82 ms (ADR 0006).
+506 ms → 3.6 ms for the query, model build from ~2.1 s to 82 ms (ADR 0006).
 
 ## M6 — Dashboards and packaging
 

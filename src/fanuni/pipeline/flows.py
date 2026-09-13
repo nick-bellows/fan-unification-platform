@@ -24,7 +24,12 @@ from fanuni.config import Settings, load_settings
 from fanuni.pipeline import db
 from fanuni.pipeline.contracts import validate_rows
 from fanuni.pipeline.lake import ensure_bucket, put_bytes, s3_client
-from fanuni.pipeline.load import RAW_TABLES, quarantine_rows, replace_batch
+from fanuni.pipeline.load import (
+    RAW_TABLES,
+    quarantine_rows,
+    replace_batch,
+    supersede_quarantine,
+)
 from fanuni.pipeline.salesforce import SalesforceClient, build_soql
 
 SF_OBJECTS: tuple[tuple[str, str], ...] = (
@@ -58,7 +63,9 @@ def batch_month(file_name: str) -> str | None:
     return match.group(1) if match else None
 
 
-def next_watermark(accepted: list[str], rejected: list[str], current: str | None) -> str | None:
+def next_watermark(
+    accepted: list[str], rejected: list[str | None], current: str | None
+) -> str | None:
     """The highest modstamp that is safe to claim as fully processed.
 
     A quarantined row must stay re-extractable, and its corrected version
@@ -67,11 +74,17 @@ def next_watermark(accepted: list[str], rejected: list[str], current: str | None
     caught the earlier version advancing past rejects that had later accepted
     neighbors.) Returns None when the watermark must not move; a standing
     reject therefore holds the watermark until the upstream row is fixed,
-    which trades re-extraction volume for never losing a correction.
+    which trades re-extraction volume for never losing a correction. A
+    reject with no usable SystemModstamp (missing or null — one of the
+    reasons a row can be rejected) also holds the watermark: there is no
+    way to know which accepted rows precede it.
     """
     if not accepted:
         return None
-    ceiling = min(rejected) if rejected else None
+    stamps = [stamp for stamp in rejected if isinstance(stamp, str)]
+    if len(stamps) != len(rejected):
+        return None
+    ceiling = min(stamps) if stamps else None
     safe = [stamp for stamp in accepted if ceiling is None or stamp < ceiling]
     if not safe:
         return None
@@ -135,13 +148,17 @@ def ingest_salesforce(full_refresh: bool = False) -> dict[str, int]:
 
             good, rejects = validate_rows(source_key, records)
             loaded = replace_batch(conn, source_key, good, batch_id=key, source_file=key)
+            # Every record past the watermark is re-extracted each run, so any
+            # Id in this batch supersedes its quarantine rows from earlier
+            # extracts (a fixed row clears; a standing reject is not duplicated).
+            supersede_quarantine(conn, source_key, "Id", [str(r["Id"]) for r in records])
             quarantine_rows(conn, source_key, rejects, batch_id=key, source_file=key)
             db.audit_load(
                 conn, run_id, source_key, key, RAW_TABLES[source_key], loaded, len(rejects)
             )
             new_watermark = next_watermark(
                 [r["SystemModstamp"] for r in good],
-                [row["SystemModstamp"] for row, _reason in rejects],
+                [row.get("SystemModstamp") for row, _reason in rejects],
                 after,
             )
             if new_watermark is not None:
@@ -151,8 +168,7 @@ def ingest_salesforce(full_refresh: bool = False) -> dict[str, int]:
             logger.info("%s: loaded %d rows (%d quarantined)", sobject, loaded, len(rejects))
         db.finish_run(conn, run_id, "completed")
     except Exception:
-        conn.rollback()
-        db.finish_run(conn, run_id, "failed")
+        db.mark_run_failed(conn, run_id)
         raise
     finally:
         conn.close()
@@ -182,8 +198,7 @@ def transform_warehouse(unify_mode: str = "full") -> dict[str, Any]:
         db.finish_run(conn, run_id, "completed")
         return {"models_run": len(staging) + len(downstream), **unify_stats}
     except Exception:
-        conn.rollback()
-        db.finish_run(conn, run_id, "failed")
+        db.mark_run_failed(conn, run_id)
         raise
     finally:
         conn.close()
@@ -217,7 +232,7 @@ def run_quality_gates() -> dict[str, int]:
         enforce_gate(results)
         return summary
     except Exception:
-        db.finish_run(conn, run_id, "failed")
+        db.mark_run_failed(conn, run_id)
         raise
     finally:
         conn.close()
@@ -290,8 +305,7 @@ def ingest_file_sources(
                     logger.warning("%s: quarantined %d rows", path.name, len(rejects))
         db.finish_run(conn, run_id, "completed")
     except Exception:
-        conn.rollback()
-        db.finish_run(conn, run_id, "failed")
+        db.mark_run_failed(conn, run_id)
         raise
     finally:
         conn.close()

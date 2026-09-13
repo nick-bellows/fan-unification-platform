@@ -48,6 +48,14 @@ def finish_run(conn: psycopg.Connection[Any], run_id: str, status: str) -> None:
     conn.commit()
 
 
+def mark_run_failed(conn: psycopg.Connection[Any], run_id: str) -> None:
+    """Record a failed run. The rollback comes first: after a failed statement
+    the transaction is aborted and the status UPDATE itself would raise
+    InFailedSqlTransaction, burying the real error under a second one."""
+    conn.rollback()
+    finish_run(conn, run_id, "failed")
+
+
 def audit_load(
     conn: psycopg.Connection[Any],
     run_id: str,

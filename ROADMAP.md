@@ -15,7 +15,7 @@ Last verified: 2026-09-10
 
 This repository already covers the highest-value Junior Data Engineer signals: heterogeneous ingestion, a Salesforce-shaped API, Prefect orchestration, incremental/idempotent loads, quarantine, explainable entity resolution, SCD2, data-quality checks, Redshift-oriented DDL, and BI marts. Do not replace that depth with a generic dashboard project.
 
-## Completed milestone - five-minute data lineage tour
+## Completed milestone - three-minute data lineage tour
 
 Delivered and locally verified from a fresh 5,000-person synthetic generation on 2026-09-02.
 The site now includes a SQL-generated identity-to-mart trace, direct implementation links,
@@ -84,10 +84,14 @@ who must do them.
    change gate (new code only for household modeling or an observed weakness).
 2. **Household modeling** — the single sanctioned engineering experiment:
    shared contact details are the dominant measured false-merge source (227
-   impure clusters; the tour now displays the worst one). Lock the current
+   impure clusters on the 2026-09-04 seed-42 run, from
+   `ops.linkage_cluster_truth`; the tour displays the worst one). Lock the current
    generator, splits, metrics, and thresholds before the experiment; publish
    the result even if it does not beat the baseline.
-Done 2026-09-10, on the author's instruction to complete the project (no
+
+### Done 2026-09-10
+
+On the author's instruction to complete the project (no
 behavior, number, or claim changed):
 
 - **Supply-chain finishers.** Every GitHub Action ref is SHA-pinned with its
@@ -98,6 +102,28 @@ behavior, number, or claim changed):
   on the blockquote background) is fixed with a `base-content-muted` theme
   override; the Playwright WCAG test now runs every reviewer route in both
   light and dark and asserts the shell is really in each theme.
+
+### Done 2026-09-12 — finish-line review
+
+A three-part code review (Python, SQL and site, CI and docs) with every
+finding verified in the source before it was fixed; no published metric
+changed:
+
+- **Registry move.** Docker Hub stopped serving `minio/minio`, which turned
+  the nightly red and would have failed every push; compose now pulls the
+  same digest from quay.io.
+- **Workflows fail when the pipeline fails.** The nightly piped through
+  `tee` without pipefail; every workflow now runs bash with pipefail, the
+  Pages deploy is serialized, and the pip cache is keyed on the lock.
+- **Correctness.** `fan_360` rolls email engagement up by identity instead
+  of by SCD2 version key (a version change used to zero a fan's email
+  history); failed runs roll back before their status update; a
+  non-numeric merch cell quarantines its row, not the file; a CRM reject
+  without a modstamp holds the watermark; re-extracted CRM Ids supersede
+  their older quarantine rows; phone `''` is now NULL in staging; merch
+  gains a staging→fact reconcile and giving an orphan-opportunity warning.
+- **Claims.** The tour's false-merge text now says what its SQL selects;
+  stale counts and the pre-v3 review-band description were corrected.
 
 All other deferred work (Redshift burst deployment, Prefect Cloud, scale
 testing, lake-key versioning, adversarial CRM-timestamp fixtures) remains in

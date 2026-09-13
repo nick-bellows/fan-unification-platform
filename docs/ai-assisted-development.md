@@ -18,7 +18,8 @@ of external findings, and every merge.
 this repo asks to be trusted on the author's or the tool's word:
 
 - The linkage metrics regenerate from committed code and seeds
-  (`fanuni evaluate`), run nightly in CI, and are floor-gated.
+  (`fanuni evaluate`); the CI integration job floor-gates them and the
+  nightly run keeps each evaluation as an artifact.
 - Quality gates are themselves tested by breaking the data and watching them
   fail (`tests/integration/test_transform.py`).
 - The published dashboards are built in CI from a real pipeline run, with an

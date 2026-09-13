@@ -133,9 +133,7 @@ def tag_breakdown(
     return rows
 
 
-def _write_review_csv(
-    path: Path, records: list[IdentityRecord], combined: CombinedClusters, review: list[Any]
-) -> None:
+def _write_review_csv(path: Path, records: list[IdentityRecord], review: list[Any]) -> None:
     by_ref = {r.ref: r for r in records}
     path.parent.mkdir(parents=True, exist_ok=True)
     columns = ["probability"]
@@ -213,7 +211,7 @@ def run_eval(
     det_tags = tag_breakdown(truth, det_clusters, det_fp, det_fn)
     full_tags = tag_breakdown(truth, combined.clusters, full_fp, full_fn)
 
-    _write_review_csv(review_dir / "review_pairs.csv", records, combined, prob.review_band)
+    _write_review_csv(review_dir / "review_pairs.csv", records, prob.review_band)
     _write_cluster_truth(conn, combined, truth)
 
     evaluated_at = datetime.now(UTC).isoformat()

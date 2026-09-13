@@ -137,4 +137,7 @@ def query_next(
         state = json.loads(base64.urlsafe_b64decode(cursor.encode()))
     except (binascii.Error, ValueError) as exc:
         raise HTTPException(status_code=400, detail="INVALID_QUERY_LOCATOR") from exc
-    return _query_page(state["sobject"], state["after"], state["offset"], state["limit"])
+    try:
+        return _query_page(state["sobject"], state["after"], state["offset"], state["limit"])
+    except (KeyError, TypeError) as exc:  # well-formed base64, wrong shape
+        raise HTTPException(status_code=400, detail="INVALID_QUERY_LOCATOR") from exc

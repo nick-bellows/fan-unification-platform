@@ -41,6 +41,7 @@ for (const check of [
   { route: "/unification", tables: 2, text: "deterministic", selector: "td:visible" },
   { route: "/ops", tables: 3, text: "Data-quality gates", selector: "a:visible" },
   { route: "/revenue", tables: 2, text: "Ticket → merch cohorts", selector: "a:visible" },
+  { route: "/engagement", tables: 1, text: "Email Engagement", selector: "h1:visible" },
 ]) {
   test(`${check.route} renders its claim-bearing data`, async ({ page }) => {
     await openRenderedPage(page, check.route);
@@ -59,7 +60,7 @@ for (const scheme of ["light", "dark"] as const) {
     page,
   }) => {
     await page.emulateMedia({ colorScheme: scheme });
-    for (const route of ["/", "/start", "/unification", "/ops", "/revenue"]) {
+    for (const route of ["/", "/start", "/unification", "/ops", "/revenue", "/engagement"]) {
       await openRenderedPage(page, route);
       // Guard against a silent no-op: the shell must actually be in this theme.
       await expect(page.locator("html")).toHaveAttribute("data-theme", scheme);

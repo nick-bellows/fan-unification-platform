@@ -7,6 +7,5 @@ FROM staging.stg_ticketing_orders GROUP BY order_id HAVING count(*) > 1
 UNION ALL
 SELECT 'stg_email_subscribers', subscriber_id, count(*)
 FROM staging.stg_email_subscribers GROUP BY subscriber_id HAVING count(*) > 1
-UNION ALL
-SELECT 'stg_merch_orders', order_number, count(*)
-FROM staging.stg_merch_orders GROUP BY order_number HAVING count(*) > 1
+-- stg_merch_orders is GROUP BY order_number by construction, so a uniqueness
+-- check on it could never fail; merch is covered by its fact reconcile.

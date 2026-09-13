@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Sequence
 
 from fanuni import __version__
@@ -115,7 +116,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.select:
             from pathlib import Path
 
-            from fanuni.pipeline.db import connect, finish_run, start_run
+            from fanuni.pipeline.db import connect, finish_run, mark_run_failed, start_run
             from fanuni.pipeline.sql_runner import run_models
 
             settings = load_settings()
@@ -126,9 +127,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                         conn, Path(settings.warehouse_dir) / "models", run_id, select=args.select
                     )
                 except Exception:
-                    finish_run(conn, run_id, "failed")
+                    mark_run_failed(conn, run_id)
                     raise
                 finish_run(conn, run_id, "completed")
+            if not results:
+                print(f"no model matched --select {args.select!r}", file=sys.stderr)
+                return 2
             for result in results:
                 print(f"{result.model.schema}.{result.model.table}: {result.rows} rows")
             return 0

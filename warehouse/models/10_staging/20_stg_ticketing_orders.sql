@@ -28,7 +28,7 @@ SELECT
        ELSE initcap(regexp_replace(btrim(payload->>'purchaser_name'), '^.*\s', ''))
   END                                        AS last_name,
   lower(btrim(payload->>'purchaser_email'))  AS email,
-  right(regexp_replace(coalesce(payload->>'purchaser_phone', ''), '[^0-9]', '', 'g'), 10)
+  nullif(right(regexp_replace(coalesce(payload->>'purchaser_phone', ''), '[^0-9]', '', 'g'), 10), '')
                                              AS phone,
   left(nullif(payload->>'purchaser_zip', ''), 5) AS zip
 FROM ranked

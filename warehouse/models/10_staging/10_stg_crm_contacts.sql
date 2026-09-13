@@ -16,7 +16,8 @@ SELECT
   initcap(btrim(payload->>'FirstName'))                  AS first_name,
   initcap(btrim(payload->>'LastName'))                   AS last_name,
   lower(btrim(payload->>'Email'))                        AS email,
-  right(regexp_replace(coalesce(payload->>'Phone', ''), '[^0-9]', '', 'g'), 10) AS phone,
+  nullif(right(regexp_replace(coalesce(payload->>'Phone', ''), '[^0-9]', '', 'g'), 10), '')
+    AS phone,
   payload->>'MailingCity'                                AS city,
   payload->>'MailingState'                               AS state,
   left(payload->>'MailingPostalCode', 5)                 AS zip,

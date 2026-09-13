@@ -151,9 +151,10 @@ where is_current
 ## Anatomy of a false merge
 
 The matcher is measured, not perfect — and the dominant failure mode deserves
-the same visibility as the success story. This is the **largest cluster the
-ground truth says is wrong**: its records belong to more than one real
-(generated) person, merged because a household shares one email address.
+the same visibility as the success story. This is the **wrong cluster that
+spans the most real people**: the ground truth says its records belong to
+several distinct (generated) persons, chained together through household-
+shared email addresses and matching phone-and-surname evidence.
 
 ```sql false_merge
 select * from fanuni.false_merge_trace

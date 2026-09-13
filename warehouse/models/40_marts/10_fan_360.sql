@@ -19,12 +19,17 @@ giving AS (
          max(close_date) AS last_gift_on
   FROM core.fact_giving GROUP BY fan_key
 ),
+-- Email is the one append-only fact: its rows keep the fan_key of the dim_fan
+-- version current when they loaded, and a later SCD2 version gets a new key.
+-- Roll it up by identity (fan_id) so a fan's history follows the current row.
 email AS (
-  SELECT fan_key,
+  SELECT d.fan_id,
          sum(CASE WHEN event_type = 'send'  THEN 1 ELSE 0 END) AS sends,
          sum(CASE WHEN event_type = 'open'  THEN 1 ELSE 0 END) AS opens,
          sum(CASE WHEN event_type = 'click' THEN 1 ELSE 0 END) AS clicks
-  FROM core.fact_email_engagement GROUP BY fan_key
+  FROM core.fact_email_engagement e
+  JOIN core.dim_fan d ON d.fan_key = e.fan_key
+  GROUP BY d.fan_id
 )
 SELECT
   f.fan_key, f.fan_id, f.first_name, f.last_name, f.email,
@@ -49,5 +54,5 @@ FROM core.dim_fan f
 LEFT JOIN tickets t ON t.fan_key = f.fan_key
 LEFT JOIN merch m ON m.fan_key = f.fan_key
 LEFT JOIN giving g ON g.fan_key = f.fan_key
-LEFT JOIN email e ON e.fan_key = f.fan_key
+LEFT JOIN email e ON e.fan_id = f.fan_id
 WHERE f.is_current;

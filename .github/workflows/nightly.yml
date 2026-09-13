@@ -12,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# `shell: bash` runs with `-eo pipefail`, so a failing `fanuni ... | tee`
+# fails the step; the implicit default shell has no pipefail.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   nightly:
     runs-on: ubuntu-latest
@@ -23,6 +29,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: constraints.txt
       - run: pip install -c constraints.txt -e .
       # Generate before compose up so the bind-mount sources exist with
       # runner ownership (compose would create them root-owned).

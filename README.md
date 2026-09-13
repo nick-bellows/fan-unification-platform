@@ -130,8 +130,8 @@ locally: `cd site && npm install && npm run sources && npm run dev`.
 
 | Job | Proves |
 | --- | --- |
-| `lint` / `typecheck` / `test` | ruff, mypy, 48 unit tests |
-| `integration` | 16 ordered stages against real services: full load reconciliation, re-run no-op, drift handling, quarantine, a gate that fails when data breaks, linkage-eval floors, PII grants |
+| `lint` / `typecheck` / `test` | ruff, mypy, the unit suite (`tests/test_*.py`) |
+| `integration` | ordered stages against real services (`tests/integration/`): full load reconciliation, re-run no-op, drift handling, quarantine, a gate that fails when data breaks, linkage-eval floors, PII grants |
 | `docker` / `gitleaks` / `terraform` | images build, no secrets in history, IaC validates |
 | `site` | Evidence dashboards build from a real pipeline run; a Chromium gate checks rendered data and automated accessibility before Pages deploys on `main` |
 | `nightly-pipeline` (scheduled) | operating the pipeline: nightly end-to-end run with retained artifacts |

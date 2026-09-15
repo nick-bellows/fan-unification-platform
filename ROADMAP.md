@@ -1,17 +1,19 @@
 # Roadmap
 
-Last verified: 2026-09-10
+Last verified: 2026-09-15
 
-## Handoff snapshot
+## Status snapshot
 
 | Field | Current state |
 | --- | --- |
-| Lifecycle | `PORTFOLIO-READY` — one author-side checklist away from `FINAL` |
+| Lifecycle | `PORTFOLIO-READY` — one maintainer checklist away from `FINAL` |
 | Portfolio role | Primary data-engineering and identity-resolution evidence |
 | Public presentation | Generated GitHub Pages dashboards at <https://nick-bellows.github.io/fan-unification-platform/> |
 | Public claim | Synthetic pipeline run, measured linkage, dimensional warehouse, and CI-generated dashboards |
 | Data boundary | Seeded fictional fan records; no real people or member data |
 | External review | Two independent LLM reviews (2026-08-21, 2026-09-04): both ADVANCE; every verified finding fixed the same day |
+
+2026-09-15: wording pass; no state change.
 
 This repository already covers the highest-value Junior Data Engineer signals: heterogeneous ingestion, a Salesforce-shaped API, Prefect orchestration, incremental/idempotent loads, quarantine, explainable entity resolution, SCD2, data-quality checks, Redshift-oriented DDL, and BI marts. Do not replace that depth with a generic dashboard project.
 
@@ -61,38 +63,41 @@ Keep GitHub Pages. It opens quickly, costs nothing, and the current CI-generated
 
 Vercel could host the same static output but adds no material hiring signal. Replit would require a second runtime/deployment shape and is not justified. A local Compose path remains the correct full-system demonstration.
 
-## Path to FINAL — remaining work, by owner
+## Path to FINAL
 
-Nothing in the repository blocks FINAL. The remaining items split cleanly by
-who must do them.
+Nothing in the repository blocks FINAL. Each remaining item is listed with
+what it needs.
 
-### Author — input or approval required (these gate FINAL)
+### Open items that gate FINAL
 
-1. Work the private completion checklist end to end: personally run the
-   quickstart and narrate the system; rehearse the interview material
-   (architecture and star schema from memory, the threshold-sweep and
-   review-round stories, the headline numbers); upload social-preview images;
-   decide the profile pin set; review the profile README.
-2. Declare completion. FINAL is an author decision, not an automated one.
-3. Approve or decline each optional engineering item below — silence means
-   declined; this roadmap does not self-authorize work.
+1. Open; needs the maintainer's time. Work the private completion checklist
+   end to end: run the quickstart and narrate the system; rehearse the
+   interview material (architecture and star schema from memory, the
+   threshold-sweep and review-round stories, the headline numbers); upload
+   social-preview images; decide the profile pin set; review the profile
+   README.
+2. Open; needs a decision. Declare completion. FINAL is a maintainer
+   decision, not an automated one.
+3. Open; needs a design decision. Accept or decline each optional engineering
+   item below — an undecided item stays declined; this roadmap does not
+   schedule work on its own.
 
-### Claude Code — executable on approval (none required for FINAL)
+### Optional engineering items (none required for FINAL)
 
-1. **Flip lifecycle to `FINAL — maintenance only`** once the author declares
-   the checklist done: update this snapshot, the workspace records, and the
-   change gate (new code only for household modeling or an observed weakness).
-2. **Household modeling** — the single sanctioned engineering experiment:
-   shared contact details are the dominant measured false-merge source (227
-   impure clusters on the 2026-09-04 seed-42 run, from
-   `ops.linkage_cluster_truth`; the tour displays the worst one). Lock the current
-   generator, splits, metrics, and thresholds before the experiment; publish
-   the result even if it does not beat the baseline.
+1. Open; follows the completion declaration. **Flip lifecycle to
+   `FINAL — maintenance only`** once the checklist is declared done: update
+   this snapshot, the workspace records, and the change gate (new code only
+   for household modeling or an observed weakness).
+2. Open; needs a design decision. **Household modeling** — the single
+   sanctioned engineering experiment: shared contact details are the dominant
+   measured false-merge source (227 impure clusters on the 2026-09-04 seed-42
+   run, from `ops.linkage_cluster_truth`; the tour displays the worst one).
+   Lock the current generator, splits, metrics, and thresholds before the
+   experiment; publish the result even if it does not beat the baseline.
 
 ### Done 2026-09-10
 
-On the author's instruction to complete the project (no
-behavior, number, or claim changed):
+Closing hardening for the project (no behavior, number, or claim changed):
 
 - **Supply-chain finishers.** Every GitHub Action ref is SHA-pinned with its
   version in a comment (Dependabot keeps them current); `constraints.txt`
@@ -127,7 +132,7 @@ changed:
 
 All other deferred work (Redshift burst deployment, Prefect Cloud, scale
 testing, lake-key versioning, adversarial CRM-timestamp fixtures) remains in
-`docs/future-work.md` and is not silently approved by this roadmap.
+`docs/future-work.md` and is not silently accepted by this roadmap.
 
 ## Stop conditions
 

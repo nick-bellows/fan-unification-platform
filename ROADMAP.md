@@ -162,18 +162,25 @@ metric, or published number changed.
   `minio/minio` (fixed 2026-09-12 by moving to quay.io), and as of this check
   Docker Hub returns 404 for the repository and quay.io requires
   authentication, so there is no public pull path left. The nightly failed on
-  it for six consecutive days (2026-09-25 through 2026-09-30); `ci`'s
-  `integration` job runs the same `docker compose up --wait` and will fail
-  for the same reason on the next push, though it has not run since
-  2026-09-15.
+  it for six consecutive days (2026-09-25 through 2026-09-30). The push that
+  carried this entry confirmed the blast radius: on `405f0a1`, `ci`'s
+  `integration` job and `site`'s `build` job both fail at the same image
+  pull, while `lint`, `typecheck`, `test`, `docker`, `gitleaks` and
+  `terraform` all pass. `site`'s `deploy` is skipped rather than run, so the
+  published Pages dashboards are the last good build and remain live and
+  unaffected (logged-out HTTP 200 checked 2026-09-30).
 
   **This is not fixed here.** Replacing MinIO means choosing an S3-compatible
   substitute and re-running the integration suite and linkage eval to show
   the numbers are unchanged, which needs a working Docker daemon; it is not a
   pin bump. Until then, treat the `ci` badge as red for an environment reason
   and the unit/lint/typecheck evidence as unaffected — the failure is a
-  registry pull, before any project code runs. Tracked in
-  `docs/future-work.md`.
+  registry pull, before any project code runs, and every job that does not
+  need an object store is green. Tracked in `docs/future-work.md`.
+
+  **FINAL should not be declared while this is red.** It is the one
+  repository-side thing now standing between `PORTFOLIO-READY` and the
+  maintainer's FINAL decision.
 
 ## Stop conditions
 

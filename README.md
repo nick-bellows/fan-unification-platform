@@ -2,7 +2,6 @@
 
 [![ci](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/ci.yml)
 [![site](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/site.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/site.yml)
-[![nightly](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/nightly.yml/badge.svg)](https://github.com/nick-bellows/fan-unification-platform/actions/workflows/nightly.yml)
 
 **A fan identity-resolution and data-warehouse platform, with the accuracy
 measured instead of asserted.** Four messy source systems for a fictional
@@ -90,8 +89,8 @@ What each layer demonstrates:
   stable fan_ids so SCD2 history means something
   ([ADR 0005](docs/decisions/0005-identity-interface-and-scd2.md)); a
   ground-truth eval harness the pipeline itself can never read.
-- **Ops** — Prefect retries/backoff; a nightly scheduled end-to-end run with
-  artifacts; run/load/model/check audit trail in the `ops` schema, surfaced
+- **Ops** — Prefect retries/backoff; an on-demand full-size end-to-end run
+  with retained artifacts; run/load/model/check audit trail in the `ops` schema, surfaced
   on the [ops dashboard](https://nick-bellows.github.io/fan-unification-platform/ops);
   column-level grants keeping PII from the analyst role (tested).
 - **AWS story at $0** — Postgres stands in for Redshift and MinIO for S3
@@ -134,7 +133,7 @@ locally: `cd site && npm install && npm run sources && npm run dev`.
 | `integration` | ordered stages against real services (`tests/integration/`): full load reconciliation, re-run no-op, drift handling, quarantine, a gate that fails when data breaks, linkage-eval floors, PII grants |
 | `docker` / `gitleaks` / `terraform` | images build, no secrets in history, IaC validates |
 | `site` | Evidence dashboards build from a real pipeline run; a Chromium gate checks rendered data and automated accessibility before Pages deploys on `main` |
-| `nightly-pipeline` (scheduled) | operating the pipeline: nightly end-to-end run with retained artifacts |
+| `nightly-pipeline` (on demand) | operating the pipeline: full-size end-to-end run with retained artifacts |
 
 **Known dashboard dependency boundary:** the latest Evidence.dev release still carries
 transitive npm advisories. The deployed artifact is static and contains only trusted synthetic

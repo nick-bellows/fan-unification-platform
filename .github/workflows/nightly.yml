@@ -1,12 +1,14 @@
-# The "operating a production pipeline" evidence: a scheduled end-to-end run
-# on the full-size dataset — ingest, transform, unify, quality gates, linkage
-# eval — with the run report and eval results kept as artifacts. A failure
-# fails the workflow, which notifies via GitHub's standard channels.
+# The "operating a production pipeline" evidence: a full-size end-to-end run
+# — ingest, transform, unify, quality gates, linkage eval — with the run
+# report and eval results kept as artifacts. A failure fails the workflow.
+#
+# Run on demand only (2026-09-30). The nightly cron was removed when the
+# repository went maintenance-only: an unattended daily run on a frozen
+# project reports upstream rot, not regressions in this code. The job body is
+# unchanged, so `workflow_dispatch` still exercises the same path.
 name: nightly-pipeline
 
 on:
-  schedule:
-    - cron: "17 6 * * *"
   workflow_dispatch:
 
 permissions:

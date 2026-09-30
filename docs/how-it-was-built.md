@@ -80,8 +80,9 @@ below observed values.
 
 ## M5 — Production ops
 
-Nightly scheduled workflow runs the full-size pipeline end-to-end and
-uploads the run report + eval results as artifacts; retries with backoff on
+The `nightly-pipeline` workflow runs the full-size pipeline end-to-end and
+uploads the run report + eval results as artifacts (nightly on a schedule
+until 2026-09-30, on demand since); retries with backoff on
 network tasks; a one-page runbook covers backfills, drift, quarantine triage,
 and review-band handling. Terraform for the real AWS deployment (S3 +
 Redshift Serverless + COPY role) validates in CI and is deliberately never

@@ -15,6 +15,10 @@ Last verified: 2026-09-15
 
 2026-09-15: wording pass; no state change.
 
+2026-09-30: recurring GitHub automation switched off, and an upstream
+registry change now breaks every compose-dependent job. See
+"Done 2026-09-30" — this one does change what the badges mean.
+
 This repository already covers the highest-value Junior Data Engineer signals: heterogeneous ingestion, a Salesforce-shaped API, Prefect orchestration, incremental/idempotent loads, quarantine, explainable entity resolution, SCD2, data-quality checks, Redshift-oriented DDL, and BI marts. Do not replace that depth with a generic dashboard project.
 
 ## Completed milestone - three-minute data lineage tour
@@ -133,6 +137,43 @@ changed:
 All other deferred work (Redshift burst deployment, Prefect Cloud, scale
 testing, lake-key versioning, adversarial CRM-timestamp fixtures) remains in
 `docs/future-work.md` and is not silently accepted by this roadmap.
+
+### Done 2026-09-30 — recurring automation off, compose blocked upstream
+
+Owner decision, plus a defect found while carrying it out. No pipeline code,
+metric, or published number changed.
+
+- **The nightly cron is removed;** `nightly-pipeline` is `workflow_dispatch`
+  only and its README badge is gone. On a maintenance-only repository an
+  unattended daily run reports upstream rot rather than regressions in this
+  code — which is exactly what it had been doing. The job body is unchanged,
+  so the "operating the pipeline" evidence is still runnable on demand; the
+  README now says "on demand" instead of "nightly" in both places it claimed
+  a schedule.
+- **Dependabot version updates are removed** (`.github/dependabot.yml`
+  deleted). Action refs stay SHA-pinned; the note in "Done 2026-09-10" that
+  Dependabot keeps them current is history, and no longer describes today —
+  they are bumped by hand if this repository is reopened.
+- **Known broken, not yet fixed: the MinIO image is unreachable.**
+  `compose.yml` pins
+  `quay.io/minio/minio@sha256:14cea493…`, which now returns
+  `unauthorized: access to the requested resource is not authorized`. This is
+  the second registry move for the same image: Docker Hub dropped
+  `minio/minio` (fixed 2026-09-12 by moving to quay.io), and as of this check
+  Docker Hub returns 404 for the repository and quay.io requires
+  authentication, so there is no public pull path left. The nightly failed on
+  it for six consecutive days (2026-09-25 through 2026-09-30); `ci`'s
+  `integration` job runs the same `docker compose up --wait` and will fail
+  for the same reason on the next push, though it has not run since
+  2026-09-15.
+
+  **This is not fixed here.** Replacing MinIO means choosing an S3-compatible
+  substitute and re-running the integration suite and linkage eval to show
+  the numbers are unchanged, which needs a working Docker daemon; it is not a
+  pin bump. Until then, treat the `ci` badge as red for an environment reason
+  and the unit/lint/typecheck evidence as unaffected — the failure is a
+  registry pull, before any project code runs. Tracked in
+  `docs/future-work.md`.
 
 ## Stop conditions
 
